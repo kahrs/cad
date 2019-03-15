@@ -1,0 +1,13 @@
+package x
+
+  type Int where {Eq(Int, Bool), Ord(Int, Bool), Num(Int), Integers(Int), 
+                  Ix(Int), Enum(Int)};
+  instance (+) (Int -> Int -> Int) { (+) = primitive "PlusInt"; };
+  instance (*) (Int -> Int -> Int) { (*) = primitive "MultInt"; };
+  instance (:-) (a -> [a] -> [a]) { (:-) = primitive "Cons"; };
+  genericLength :: [b] -> a where { Integers (a) };
+  genericLength(xs) = len(0,xs) where {
+          len(n,[])     = n;
+          len(n,(x:-xs))= len((n + 1),xs); };
+
+end x;

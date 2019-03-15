@@ -1,0 +1,10 @@
+package x
+
+  instance (==) (Int -> Int -> Bool) { (==) = primitive "primEqInt"; };
+  instance (:-) (a -> [a] -> [a]) { (:-) = primitive "Cons"; };
+  listEq :: ((==) :: a -> a -> Bool ==> [a] -> [a] -> Bool);
+  listEq(x,y) = leq(x,y) where {
+          leq([],[])     = True;
+          leq((x:-xs),(y:-ys)) = x == y && leq(xs,ys);
+  };
+end x;

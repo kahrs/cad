@@ -1,0 +1,54 @@
+.TH MHDL 1 "" 
+.SH NAME
+mhdl - MHDL Front End
+.SH SYNOPSIS
+mhdl [file(s)]
+.SH DESCRIPTION
+.I Mhdl 
+is a front end for MHDL.
+Currently,  
+.I Mhdl 
+reads an MHDL file and performs syntax checking on it. 
+.I Mhdl
+will report any errors to the standard error. Error messages will include
+line of the offending MHDL statement and will identify 
+any tokens the syntax checker was expecting.  
+
+Note that MHDL as defined by the MHDL Language Reference 
+Manual (LRM) is not LALR(1). For the purposes of this 
+syntax checker, the definition of the language in the LRM has been
+"loosened" somewhat, so that the syntax checker will actually accept a
+superset of MHDL. This is particularly true in the area of patterns and
+expressions.  Semantic checking will be added in the future to correct
+this.
+
+.SH OPTIONS
+.ta 2.5i
+.SH USAGE
+.nf
+.ta 2.0i
+    $ mhdl [files] 
+.fi
+.SH FILES
+.nf
+.ta 2i
+.fi
+.SH BUGS
+.sp 0.5
+.SH SEE\ ALSO
+.sp 0.5
+MHDL Language Reference Manual, December 20, 1993. 
+.SH COPYRIGHT
+.sp 0.5
+This software is furnished with unlimited rights as set forth
+in Defense Federal Acquisition Regulation Supplement (DFARS)
+clause 252.227-7013, unless otherwise noted.  This material may
+be reproduced by or for the United States Government pursuant
+to the copyright license under the clause at DFARS 252.227-7013
+(Oct 1988).
+
+Additionally, users of this software are free to make copies
+of the software for MHDL Working Group usage, provided that
+such copies are not resold or otherwise distributed, in any form,
+to third parties by these users.  This copyright notice and
+legend must be included on all copies made.

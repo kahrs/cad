@@ -1,0 +1,34 @@
+</$objtype/mkfile
+CFLAGS=-DPLAN9
+FILES=lex.c mhdl.c mhdl.h sym.c semantics.c types.c mhdl.y stdarg.h gvarargs.h \
+	Makefile.sun Makefile.others \
+	units.mhdl standard.mhdl math.mhdl uwave.mhdl \
+	errors.awk tokens.awk mies.1 \
+	LICENSE COPYING README HISTORY
+OS=mhdl.tab.$O lex.$O mhdl.$O sym.$O semantics.$O types.$O
+
+%.$O: %.c mhdl.h
+	$CC $CFLAGS $stem.c
+
+mies: $OS
+	$LD -o $target $prereq -lstdio -lc
+
+mhdl.tab.c: mhdl.y
+	yacc -d -D1 -v -s mhdl $prereq
+
+lex.$O: mhdl.tab.c mhdl.h
+
+mhdl.tar: $FILES
+	tar cvf $target $prereq
+
+mhdl.ar: $FILES
+	ar cvf $target $prereq
+
+acid: mhdl.h
+	$CC -a dummy.c > acid
+
+print:
+	pr $FILES | lp -d fn -n 2
+
+clean:
+	rm -f mhdl mhdl.tab.c lex.yy.c *.[$OS]

@@ -1,0 +1,2113 @@
+package Standard 
+
+  class Eq (a, b) {
+    (==), (/=)          :: a -> a -> b;
+    x /= y              =  not (x == y);
+  } where Boolfunc(b);
+  class Ord (a, b)  {
+    (<), (<=), (>=), (>):: a -> a -> b;
+
+    x <  y              =  x <= y && x /= y;
+    x >= y              =  y <= x;
+    x >  y              =  y <  x;
+  } where { Eq(a, b), Boolfunc(b) };
+  class TypedGroup (a)  {
+    addOp, subOp        :: a -> a -> (a, Resultcode);
+  } where Eq (a, Bool);
+  
+  class Group (a)  {
+    (+), (-)            :: a -> a -> a;
+    m + n               = twoOpResult (addOp, m, n);
+    m - n               = twoOpResult (subOp, m, n);
+  } where TypedGroup (a);
+  class TypedNum (a)  {
+    negOp, absOp, sigOp :: a -> (a, ResultCode);
+  } where Group (a);
+  
+  class Num (a)  {
+    negate              :: a -> a;
+    abs, signum         :: a -> a;
+    negate (m)          = oneOpResult (negOp, m);
+    abs (m)             = oneOpResult (absOp, m);
+    signum (m)          = oneOpResult (sigOp, m);
+  } where TypedNum (a);
+  class TypedMult (a, b)  {
+    mulOp     :: a -> b -> (a, ResultCode);
+  };
+
+  class Mult (a, b)  {
+    (*)       :: a -> b -> a;
+    m * n               = twoOpResult (mulOp, m, n);
+  }   where TypedMult (a, b);
+  class Ix (a)   {
+    range               :: (a,a) -> [a];
+    index               :: (a,a) -> a -> Int;
+    inRange             :: (a,a) -> a -> Bool;
+  } where Ord(a, Bool);
+  class Enum (a) {
+    ord                 :: a -> Int;
+    val                 :: Int -> a;
+    enumFrom            :: a -> [a];            -- [n..]
+    enumFromThen        :: a -> a -> [a];       -- [n,n1..]
+    enumFromTo          :: a -> a -> [a];       -- [n..m]
+    enumFromThenTo      :: a -> a -> a -> [a];  -- [n,n1..m]
+
+    enumFromTo(n,m)     =  takeWhile((>=) (m), enumFrom(n));
+    enumFromThenTo(n,n1,m)
+                        =  takeWhile(((if n1 >= n then (>=) else (<=))(m)),
+                                     (enumFromThen(n,n1))); 
+  } where Ix(a);
+  class TypedIntegers (a) {
+    dvrOp               :: a -> a -> (a, a, ResultCode);
+  } where { Mult (a, a), Num (a) } ;
+    
+  class Integers (a)    {
+    div, rem, mod       :: a -> a -> a;
+    divRem              :: a -> a -> (a,a);
+    even, odd           :: a -> Bool;
+
+    x ``divRem`` y      =  case isNumeric (r) of {
+                                True -> (val1, val2); }
+			   where { (val1, val2, r) = dvrOp (x, y); } ;
+    x ``div`` y         =  q  where { (q,r) = divRem (x, y); };
+    x ``rem`` y         =  r  where { (q,r) = divRem (x, y); };
+    x ``mod`` y         =  if signum (x) == - signum (y) then r + y else r
+                           where { r = x ``rem`` y; };
+    even(x)             =  x ``rem`` 2 == 0;
+    odd                 =  not <> even; 
+  } where TypedIntegers (a);
+  class TypedFractional (a)  {
+    divOp               :: a -> a -> (a, ResultCode);
+  } where { Mult (a,a), Num (a) } ;
+
+  class Fractional (a)  {
+    (/)                 :: a -> a -> a;
+    recip               :: a -> a;
+    x / y               = twoOpResult (divOp, x, y);
+    recip (m)           = 1 / m;
+  } where TypedFractional (a); 
+  class TypedReal (a)   {
+    expOp, logOp        :: a -> (a, ResultCode);
+    sinOp, cosOp        :: a -> (a, ResultCode);
+    asinOp, acosOp      :: a -> (a, ResultCode);
+    atanOp              :: a -> (a, ResultCode);
+    sinhOp, coshOp      :: a -> (a, ResultCode);
+    asinhOp, acoshOp    :: a -> (a, ResultCode);
+    atanhOp             :: a -> (a, ResultCode);
+  } where Fractional (a);
+
+  class Real (a)        {
+    pi                  :: a;
+    e                   :: a;
+    exp, log, sqrt      :: a -> a;
+    (**), logBase       :: a -> a -> a;
+    sin, cos, tan       :: a -> a;
+    asin, acos, atan    :: a -> a;
+    sinh, cosh, tanh    :: a -> a;
+    asinh, acosh, atanh :: a -> a;
+
+    e                   =  exp (1.0) ;
+    exp (x)             =  oneOpResult (expOp, x);
+    log (x)             =  oneOpResult (logOp, x);
+    x ** y              =  exp (log(x) * y);
+    logBase(x,y)        =  log(y) / log(x);
+    sqrt(x)             =  x ** 0.5;
+    sin (x)             =  oneOpResult (sinOp, x);
+    cos (x)             =  oneOpResult (cosOp, x);
+    tan (x)             =  sin (x) / cos (x);
+    asin (x)            =  oneOpResult (asinOp, x);
+    acos (x)            =  oneOpResult (acosOp, x);
+    atan (x)            =  oneOpResult (atanOp, x);
+    sinh (x)            =  oneOpResult (sinhOp, x);
+    cosh (x)            =  oneOpResult (coshOp, x);
+    tanh(x)             =  sinh(x) / cosh(x);
+    asinh (x)           =  oneOpResult (asinhOp, x);
+    acosh (x)           =  oneOpResult (acoshOp, x);
+    atanh (x)           =  oneOpResult (atanhOp, x); 
+  } where TypedReal (a)  ;
+  class RealFrac (a)    {
+    properFraction      :: a -> (b,a) where { Integers (b) };
+    truncate, round     :: a -> b where { Integers (b) };
+    ceiling, floor      :: a -> b where { Integers (b) };
+
+    truncate(x)          = n where { (n, r) = properFraction(x); };
+    round(x)             = case signum (abs (r - 0.5)) of {
+                             -1 -> n;
+                              0 -> if even (n) then n else m;
+                              1 -> m;
+  }                          where {(n, r) = properFraction(x);
+                                  m = if r < 0 then n-1 else n+1; };
+    ceiling(x)           = if r > 0 then n+1 else n
+                           where { (n, r) = properFraction(x); };
+    floor(x)             = if r < 0 then n-1 else n
+                           where { (n, r) = properFraction(x); }; 
+  } where {Enum(a), Fractional(a)};
+  class  RealFloat (a)  {
+    floatRadix          :: a -> Int;
+    floatDigits         :: a -> Int;
+    floatRange          :: a -> (Int,Int);
+    decodeFloat         :: a -> (Int,Int);
+    encodeFloat         :: Int -> Int -> a;
+    exponent            :: a -> Int;
+    significand         :: a -> a;
+    scaleFloat          :: Int -> a -> a;
+
+    exponent(x)         =  if m == 0 then 0 else n + floatDigits(x)
+                           where { (m,n) = decodeFloat(x); };
+    significand(x)      =  encodeFloat(m,(- (floatDigits(x))))
+                           where { (m,_) = decodeFloat(x); };
+    scaleFloat(k,x)     =  encodeFloat(m,(n+k))
+                           where { (m,n) = decodeFloat(x); } ; 
+  } where { RealFrac (a), Real (a) };
+  type Integer where  {Eq(Integer, Bool), Ord(Integer, Bool),
+               Num(Integer), Integers(Integer), Ix(Integer),
+               Enum(Integer)}; 
+
+  instance  Eq (Integer, Bool)  {
+    (==)                =  primitive "EqInteger";
+    (/=)                =  primitive "NotEqInteger"; } ;
+
+  instance  Ord (Integer, Bool) {
+    (<)                 =  primitive "LtInteger";
+    (<=)                =  primitive "LeInteger";
+    (>=)                =  primitive "NotLtInteger";
+    (>)                 =  primitive "NotLeInteger"; } ;
+
+  instance  TypedGroup (Integer)  {
+    addOp               =  primitive "PlusInteger";
+    subOp               =  primitive "MinusInteger"; } ;
+
+  instance Group (Integer);
+
+  instance  TypedNum (Integer)  {
+    negOp               =  primitive "NegInteger";
+    absOp               =  primitive "AbsInteger";
+    sigOp               =  primitive "SigInteger"; } ;
+
+  instance Num (Integer);
+
+  instance TypedMult (Integer, Integer)  {
+    mulOp               =  primitive "MulInteger"; } ;
+
+  instance Mult (Integer, Integer);
+
+  instance  TypedIntegers (Integer) {
+    dvrOp               =  primitive "DivRemInteger"; } ;
+
+  instance Integers (Integer);
+
+  instance  Ix (Integer) {
+    range((m,n))        =  [m..n];
+    index((m,n),i)      =  i - m;
+    inRange((m,n),i)    =  m <= i && i <= n; } ;
+
+  instance  Enum (Integer) {
+    enumFrom(n)         =  enumFromBy(n,1);
+    enumFromThen(n,m)   =  enumFromBy(n,(m - n)); } ;
+  type Int where {Eq(Int, Bool), Ord(Int, Bool), Num(Int), Integers(Int), 
+                  Ix(Int), Enum(Int)};
+
+  instance  Eq (Int, Bool) {
+    (==)                =  primitive "EqInt";
+    (/=)                =  primitive "NotEqInt"; } ;
+
+  instance  Ord (Int, Bool) {
+    (<)                 =  primitive "LtInt";
+    (<=)                =  primitive "LeInt";
+    (>=)                =  primitive "NotLtInt";
+    (>)                 =  primitive "NotLeInt"; } ;
+
+  instance  TypedGroup (Int) {
+    addOp               =  primitive "PlusInt";
+    subOp               =  primitive "MinusInt";  } ;
+
+  instance Group (Int);
+
+  instance  TypedNum (Int) {
+    negOp               =  primitive "NegInt";
+    absOp               =  primitive "AbsInt";
+    sigOp               =  primitive "SigInt"; } ;
+
+  instance Num (Int);
+
+  instance  TypedMult (Int, Int) {
+    mulOp               =  primitive "MulInt";  } ;
+
+  instance Mult (Int, Int);
+
+  instance  TypedIntegers (Int) {
+    dvrOp               =  primitive "DivRemInt"; } ;
+
+  instance Integers (Int);
+
+  instance  Ix (Int) {
+    range((m,n))        =  [m..n];
+    index((m,n),i)      =  i - m;
+    inRange((m,n),i)    =  m <= i && i <= n; } ;
+
+  instance  Enum (Int) {
+    enumFrom(n)         =  enumFromBy(n,1);
+    enumFromThen(n,m)   =  enumFromBy(n,(m - n)); } ;
+  type  Ratio (a)         = a // a where { Integers (a) };
+  type  Rational          = Ratio (Integer);
+
+  instance Eq (Ratio (a), Bool) {
+    (a//b) == (c//dd) = a == c && b == dd; } 
+  where Integers (a);
+
+  instance Ord (Ratio (a), Bool) {
+    (x//y) <= (x1//y1)  =  x * y1 <= x1 * y; } 
+  where Integers (a);
+
+  instance Group (Ratio (a)) {
+    (x//y) + (x1//y1)   =  ((x*m) ``div`` y + (x1*m) ``div`` y1) // m
+                           where { m = lcm(y,y1); } ;
+    (x//y) - (x1//y1)   =  ((x*m) ``div`` y - (x1*m) ``div`` y1) // m
+                           where { m = lcm(y,y1); } ;
+  } where Integers (a);
+
+  instance Num (Ratio (a)) {
+    negate((x//y))      =  (-x) // y;
+    abs((x//y))         =  abs(x) // y;
+    signum((x//y))      =  signum(x) // 1; } 
+  where Integers (a);
+
+  instance Mult (Ratio (a), Ratio (a)) {
+    (x//y) * (x1//y1)   =  reduce((x * x1),(y * y1));
+  } where Integers (a);
+
+  instance Fractional (Ratio (a)) {
+    (x//y) / (x1//y1)   =  (x*y1) // (y*x1);
+  } where Integers (a) ;
+
+  instance RealFrac (Ratio (a)) {
+    properFraction((x//y))= (q, r//y)
+                            where { (q,r) = divRem(x,y); } ;
+  } where Integers (a); 
+  type Float where {Eq(Float, Bool), Ord(Float, Bool), Num(Float), 
+                    Fractional(Float), Real(Float), RealFrac(Float), 
+                    RealFloat(Float), Ix(Float), Enum(Float)};
+
+  instance  Eq (Float, Bool) {
+    (==)                =  primitive "EqFloat";
+    (/=)                =  primitive "NotEqFloat"; } ;
+
+  instance  Ord (Float, Bool) {
+    (<)                 =  primitive "LtFloat";
+    (<=)                =  primitive "LeFloat";
+    (>=)                =  primitive "NotLtFloat";
+    (>)                 =  primitive "NotLeFloat"; } ;
+
+  instance  TypedGroup (Float) {
+    addOp               =  primitive "PlusFloat";
+    subOp               =  primitive "MinusFloat"; } ;
+
+  instance  Group (Float);
+
+  instance  TypedNum (Float) {
+    negOp               =  primitive "NegFloat";
+    absOp               =  primitive "AbsFloat";
+    sigOp               =  primitive "SigFloat"; } ;
+
+  instance  Num (Float);
+
+  instance TypedMult (Float, Float) {
+    mulOp               =  primitive "MulFloat"; } ;
+
+  instance Mult (Float, Float);
+
+  instance  TypedFractional (Float) {
+    divOp               =  primitive "DivFloat"; } ;
+
+  instance Fractional (Float);
+
+  instance  TypedReal (Float) {
+    expOp               =  primitive "ExpFloat";
+    logOp               =  primitive "LogFloat";
+    sinOp               =  primitive "SinFloat";
+    cosOp               =  primitive "CosFloat";
+    asinOp              =  primitive "AsinFloat";
+    acosOp              =  primitive "AcosFloat";
+    atanOp              =  primitive "AtanFloat";
+    sinhOp              =  primitive "SinhFloat";
+    coshOp              =  primitive "CoshFloat";
+    asinhOp             =  primitive "AsinhFloat";
+    acoshOp             =  primitive "AcoshFloat";
+    atanhOp             =  primitive "AtanhFloat"; };
+
+  instance  Real (Float) {
+    pi                  =  primitive "PiFloat";  };
+
+  instance  RealFrac (Float) {
+    properFraction      =  floatProperFraction; } ;
+
+  instance  RealFloat (Float) {
+    floatRadix          =  primitive "FloatRadix";
+    floatDigits         =  primitive "FloatDigits";
+    floatRange          =  primitive "FloatRange";
+    decodeFloat         =  primitive "DecodeFloat";
+    encodeFloat         =  primitive "EncodeFloat"; };
+
+  instance  Ix (Float) {
+    range((x,y))        =  [x..y];
+    index((x,y),i)      =  floor((i - x));
+    inRange((x,y),i)    =  x <= i && i <= y; } ;
+
+  instance  Enum (Float) {
+    enumFrom(x)         =  enumFromBy(x,1);
+    enumFromThen(x,y)   =  enumFromBy(x,(y - x)); } ;
+  type ResultCode;
+  isUndef, isUnk, isPinf, isNinf :: ResultCode -> Bool;
+  isPinftes, isNinftes, isNumeric:: ResultCode -> Bool;
+  isUndef   = primitive "isUndef";
+  isUnk     = primitive "isUnk";
+  isPinf    = primitive "isPinf";
+  isNinf    = primitive "isNinf";
+  isPinftes = primitive "isPinftes";
+  isNinftes = primitive "isNinftes";
+  isNumeric = primitive "isNumeric";
+
+  oneOpResult:: (a -> (a, ResultCode)) -> a -> a;
+  oneOpResult (f, m)    =  case isNumeric(r) of {
+                                True -> val; }
+			   where { (val, r) = f (m); } ;
+
+  twoOpResult:: (a -> b -> (a, ResultCode)) -> a -> b -> a;
+  twoOpResult (f, m, n) =  case isNumeric(r) of {
+                                True -> val; }
+			   where { (val, r) = f (m, n); } ;
+
+
+  type Extnum (a) = undef | unk | pinf | ninf | pinftes | 
+                                ninftes | numeric (a) 
+  where Real (a);
+
+  instance Group (Extnum (b)) {
+    (+)                 =  primitive "PlusExtnum";
+    (-)                 =  primitive "MinusExtnum"; } 
+  where TypedGroup (b);
+
+  instance Num (Extnum (b)) {
+    negate              =  primitive "NegExtnum";
+    abs                 =  absReal;
+    signum              =  signumReal; } 
+  where TypedNum (b);
+
+  instance Mult (Extnum (b), Extnum (b)) {
+    (*)                 =  primitive "MulExtnum";
+  } where TypedMult (b,b);
+
+  instance Real (Extnum (b)) {
+    pi                  =  primitive "PiExtnum";
+    exp                 =  primitive "ExpExtnum";
+    log                 =  primitive "LogExtnum";
+    sin                 =  primitive "SinExtnum";
+    cos                 =  primitive "CosExtnum";
+    asin                =  primitive "AsinExtnum";
+    acos                =  primitive "AcosExtnum";
+    atan                =  primitive "AtanExtnum";
+    sinh                =  primitive "SinhExtnum";
+    cosh                =  primitive "CoshExtnum";
+    asinh               =  primitive "AsinhExtnum";
+    acosh               =  primitive "AcoshExtnum";
+    atanh               =  primitive "AtanhExtnum"; } 
+  where Real (b);
+
+  instance RealFrac (Extnum (b)) {
+    properFraction      =  floatProperFraction; } 
+  where RealFrac (b);
+
+  instance Ix (Extnum (b)) {
+    range((x,y))        =  [x..y];
+    index((x,y),i)      =  floor(i - x);
+    inRange((x,y),i)    =  x <= i && i <= y; } ;
+
+  instance Enum  (Extnum (b)) {
+    enumFrom(x)         =  enumFromBy(x,1);
+    enumFromThen(x,y)   =  enumFromBy(x,(y - x)); } ;
+  class Complex (a, b)  {
+    mkPolar             :: b -> b -> a;
+    mkRectang           :: b -> b -> a;
+    realPart            :: a -> b;
+    imagPart            :: a -> b;
+    cmag                :: a -> b;
+    cphase              :: a -> b;
+  } where { Real (a), Real (b) } ;
+
+  class ComplexFunc (a)  {
+    conjugate          :: a -> a;
+  } where Real (a);
+
+  type Rectang (b) = (b, b) where Real (b);
+
+  instance Eq (Rectang (b), Bool) {
+    (==)                =  primitive "EqRectang";
+    (/=)                =  primitive "NotEqRectang"; } ;
+
+  instance Group (Rectang (b)) {
+    (+)                 =  primitive "PlusRectang";
+    (-)                 =  primitive "MinusRectang"; };
+
+  instance Num (Rectang (b)) {
+    negate              =  primitive "NegRectang";
+    abs                 =  absReal;
+    signum              =  signumReal; } ;
+
+  instance Mult (Rectang (b), Rectang (b)) {
+    (*)                 =  primitive "MulRectang";  };
+
+  instance Fractional (Rectang (b)) {
+    (/)                 =  primitive "DivRectang"; } ;
+
+  instance Real (Rectang (b)) {
+    pi                  =  primitive "PiRectang";
+    exp                 =  primitive "ExpRectang";
+    log                 =  primitive "LogRectang";
+    sin                 =  primitive "SinRectang";
+    cos                 =  primitive "CosRectang";
+    asin                =  primitive "AsinRectang";
+    acos                =  primitive "AcosRectang";
+    atan                =  primitive "AtanRectang";
+    sinh                =  primitive "SinhRectang";
+    cosh                =  primitive "CoshRectang";
+    asinh               =  primitive "AsinhRectang";
+    acosh               =  primitive "AcoshRectang";
+    atanh               =  primitive "AtanhRectang"; } ;
+
+  instance Complex (Rectang (b), b) {
+    mkPolar             = primitive "MakePolarRectang";
+    mkRectang           = primitive "MakeRectangRectang";
+    realPart            = primitive "RealPartRectang";
+    imagPart            = primitive "ImagPartRectang";
+    cmag                = primitive "MagRectang";
+    ccphase             = primitive "CphaseRectang"; } ;
+
+  instance ComplexFunc (Rectang (b))  {
+    conjugate           = primitive "ConjugateRectang"; };
+
+  type Polar (b) = Polar (b, b) where Real (b);
+
+  instance Eq (Polar (b), Bool) {
+    (==)                =  primitive "EqPolar";
+    (/=)                =  primitive "NotEqPolar"; } ;
+
+  instance Group (Polar (b)) {
+    (+)                 =  primitive "PlusPolar";
+    (-)                 =  primitive "MinusPolar"; };
+
+  instance Num (Polar (b)) {
+    negate              =  primitive "NegPolar";
+    abs                 =  absReal;
+    signum              =  signumReal; } ;
+
+  instance Num (Polar (b)) {
+    (*)                 =  primitive "MulPolar";  };
+
+  instance Fractional (Polar (b)) {
+    (/)                 =  primitive "DivPolar"; } ;
+
+  instance Real (Polar (b)) {
+    pi                  =  primitive "PiPolar";
+    expOp               =  primitive "ExpPolar";
+    logOp               =  primitive "LogPolar";
+    sinOp               =  primitive "SinPolar";
+    cosOp               =  primitive "CosPolar";
+    asinOp              =  primitive "AsinPolar";
+    acosOp              =  primitive "AcosPolar";
+    atanOp              =  primitive "AtanPolar";
+    sinhOp              =  primitive "SinhPolar";
+    coshOp              =  primitive "CoshPolar";
+    asinhOp             =  primitive "AsinhPolar";
+    acoshOp             =  primitive "AcoshPolar";
+    atanhOp             =  primitive "AtanhPolar"; } ;
+
+  instance Complex (Polar (b), b) {
+    mkPolar             = primitive "MakePolarPolar";
+    mkRectang           = primitive "MakeRectangPolar";
+    realPart            = primitive "RealPartPolar";
+    imagPart            = primitive "ImagPartPolar";
+    cmag                = primitive "MagPolar";
+    cphase              = primitive "CphasePolar"; } ;
+
+  instance ComplexFunc (Polar (b))  {
+    conjugate           = primitive "ConjugatePolar"; };
+  type UnitInfo;
+  type Phys (a) = Phys (a, UnitInfo)  where { Real (a) };
+
+  type modtype where {Real (modtype), Scale (modtype, modtype)} ;
+
+  type Physical = Phys (modtype);
+
+  class Scale (a, b) {
+    scaled_value:: a -> b -> a;
+    offset_value:: a -> b -> a; } ;
+
+  instance Scale (Int, Int) {
+    scaled_value = (*);
+    offset_value = (+); } ;
+
+  instance Scale (Integer, Integer) {
+    scaled_value = (*);
+    offset_value = (+); } ;
+
+  instance Scale (Ratio (c), Ratio (c)) {
+    scaled_value = (*);
+    offset_value = (+); } ;
+
+  instance Scale (Rational, Rational) {
+    scaled_value = (*);
+    offset_value = (+); } ;
+
+  instance Scale (Float, Float) {
+    scaled_value = (*);
+    offset_value = (+); } ;
+
+  instance Scale (Extnum (c), Extnum (c)) {
+    scaled_value  = (*);
+    offset_value  = (+); } ;
+
+  instance Scale (Rectang (c), Rectang (c)) {
+    scaled_value = (*);
+    offset_value = (+); } ;
+
+  instance Scale (Polar (c), Polar (c)) {
+    scaled_value = (*);
+    offset_value = (+); } ;
+
+  instance TypedGroup (Phys (a)) {
+    addOp               =  primitive "PlusPhysical";
+    subOp               =  primitive "MinusPhysical"; 
+  } where Group (a) ;
+
+  instance Group (Phys (a));
+
+  instance TypedNum (Phys (a)) {
+    negOp               =  primitive "NegPhysical";
+    absOp               =  primitive "AbsPhysical";
+    sigOp               =  primitive "SigPhysical";
+  } where Num (a) ;
+
+  instance Num (Phys (a));
+
+  instance TypedMult (Phys (a), Phys (a)) {
+    mulOp               =  primitive "MulPhysical";
+  } where Mult (a, a);
+
+  instance Mult (Phys (a), Phys (a));
+
+  instance TypedFractional (Phys (a)) {
+    divOp               =  primitive "DivPhysical"; } 
+  where Fractional (a);
+
+  instance Fractional (Phys (a));
+
+  instance TypedReal (Phys (a)) {
+    expOp               =  primitive "ExpPhysical";
+    logOp               =  primitive "LogPhysical";
+    sinOp               =  primitive "SinPhysical";
+    cosOp               =  primitive "CosPhysical";
+    asinOp              =  primitive "AsinPhysical";
+    acosOp              =  primitive "AcosPhysical";
+    atanOp              =  primitive "AtanPhysical";
+    sinhOp              =  primitive "SinhPhysical";
+    coshOp              =  primitive "CoshPhysical";
+    asinhOp             =  primitive "AsinhPhysical";
+    acoshOp             =  primitive "AcoshPhysical";
+    atanhOp             =  primitive "AtanhPhysical"; } 
+  where Real (a) ;
+
+  instance Real (Phys (a)) {
+    pi                  =  primitive "PiPhysical";
+  } where TypedReal (Phys (a)) ;
+
+  instance RealFrac (Phys (a)) {
+    properFraction      =  floatProperFraction; } 
+  where { RealFrac (a) };
+
+  instance Ix (Phys (a)) {
+    range((x,y))        =  [x..y];
+    index((x,y),i)      =  floor(i - x);
+    inRange((x,y),i)    =  x <= i && i <= y; };
+
+  instance Enum (Phys (a)) {
+    enumFrom(x)         =  enumFromBy(x,1);
+    enumFromThen(x,y)   =  enumFromBy(x,(y - x)); };
+
+  instance Scale (Phys (a), Phys (a)) {
+    scaled_value (x, y) = x * toPhys (y);
+    offset_value (x, y) = x + (toPhys (y) * unitof (x)); } 
+  where Mult (a);
+
+  -- unitof returns a single value of the base unit of its argument
+  -- i.e., unitof (10.0 mi) returns 1 meter
+  unitof:: Phys (a) -> Phys (a) where Real (a);
+  unitof = primitive "GetPhysicalUnit";
+
+  -- The following two are treated specially.
+   dimension dimensionless;
+   unit pure_number of dimensionless;
+
+   dimension length;
+   unit meter of length variations m, metre, meters, metres;
+   unit inch of length conversion 0.0254 meter variations inches;
+   unit foot of length conversion 0.3048 meter variations feet, ft;
+   unit yard of length conversion 0.9144 meter variations yards;
+   unit mil of length conversion 0.0000254 meter variations mils;
+   unit micron of length conversion 10e-6 meter variations microns;
+
+   dimension mass;
+   unit gram of mass variations g, gm, gms, grams;
+   unit pound of mass conversion 453.5929 gram variations lb, lbs, pounds;
+   unit ounce of mass conversion 28.3495 gram variations ounces, oz;
+
+   dimension time;
+   unit second of time variations s, sec, seconds, secs;
+   unit minute of time conversion 60.0 second variations min, mins, minutes;
+   unit hour of time conversion 3600.0 second variations hours, hr, hrs;
+
+   dimension current;
+   unit ampere of current variations amp, amperes, amps, A;
+
+   dimension temperature;
+   unit kelvin of temperature variations K, kelvins, absolute;
+   kelvin_to_centigrade :: physical -> physical;
+   kelvin_to_centigrade(x) = x - 273.15;
+   centigrade_to_kelvin :: physical -> physical;
+   centigrade_to_kelvin(x) = x + 273.15;
+   unit centigrade of temperature conversion kelvin_to_centigrade
+        inverse centigrade_to_kelvin kelvin variations Celsius,
+        degree_Celsius, degC;
+   kelvin_to_Fahrenheit :: physical -> physical;
+   kelvin_to_Fahrenheit(x) = 32+(9/5)*(x - 273.15);
+   Fahrenheit_to_kelvin :: physical -> physical;
+   Fahrenheit_to_kelvin(x) = (x-32)*(5/9)+273.15;
+   unit Fahrenheit of temperature conversion kelvin_to_Fahrenheit
+        inverse Fahrenheit_to_kelvin kelvin variations degF;
+   kelvin_to_Rankene :: physical -> physical;
+   kelvin_to_Rankene(x) = (9/5)*(x - 273.15);
+   Rankene_to_kelvin :: physical -> physical;
+   Rankene_to_kelvin(x) = (5/9)*x + 273.15;
+   unit Rankene of temperature conversion kelvin_to_Rankene
+        inverse Rankene_to_kelvin kelvin variations degR;
+
+   dimension luminosity;
+   unit candela of luminosity variations cd, candle, candles;
+
+   dimension substance;
+   unit mole of substance variations moles;
+
+   dimension plane_angle;
+   unit radian of plane_angle variations rad, rads, radians;
+   unit degree of plane_angle conversion
+     floatApproxRational((pi :: double) / 180, 1.0E-10) radian 
+                        variations deg;
+     -- `pi` has been defined in the standard library, see LRM p. 112
+
+   dimension solid_angle;
+   unit steradian of solid_angle variations sr, srs, steradians;
+
+
+-- DERIVED DIMENSIONS AND UNITS ( SI, CGS, ENGLISH ... )
+
+   dimension force = 'mass * length / time^2';
+   unit newton of force = 'kg * m / sec^2' variations N, newtons;
+   unit dyne of force conversion 10^-5 newton variations dyn, dynes;
+   unit pound_force of force conversion 4.44822 newton;
+
+   dimension energy = 'force * length' variations work;
+   unit joule of energy = 'newton * meter' variations J;
+   unit erg of energy conversion 10^-7 joule variations ergs;
+   unit calorie of energy conversion 4.1840 joule
+        variations cal, cals, calories;
+   unit electron_volt of energy conversion 1.6021917*10^-19 joule
+        variations eV;
+
+   dimension power = 'energy / time';
+   unit watt of power = 'joule / second' variations W, watts;
+   unit horsepower of power conversion 735.499 watt variations hp;
+   watt_to_dBm :: physical -> physical;
+   watt_to_dBm(x) = 10 * log (x * 1000);
+   dBm_to_watt :: physical -> physical;
+   dBm_to_watt(x) = 10^(x/10)/1000;
+   unit dBm of power conversion watt_to_dBm
+               inverse dBm_to_watt watt;
+
+   dimension charge = 'current * time';
+   unit coulomb of charge  = 'ampere * sec' variations coulombs, C;
+   unit electron_charge of charge conversion 1.6021917 * 10^-19 coulomb
+        variations e;
+
+   dimension potential = 'power / current';
+   unit volt of potential = 'watt / ampere';
+
+   dimension resistance = 'potential / current'
+                          variations impedance, reactance;
+   unit ohm of resistance = 'volt / ampere' variations ohms;
+
+   dimension capacitance = 'charge / potential';
+   unit farad of capacitance = 'coulomb / volt' variations F, farads;
+
+   dimension inductance = 'potential * time / current';
+   unit henry of inductance = 'volt * second / ampere' variations H;
+
+   dimension magnetic_flux = 'potential * time';
+   unit Weber of magnetic_flux = 'volt * second' variations Wb, Webers;
+   unit Maxwell of magnetic_flux conversion 10^-8 Wb;
+
+   dimension area = 'length^2';
+   unit square_meter of area = 'm^2';
+
+   dimension volume = 'length^3';
+   unit litre of volume = 'dm^3' variations liter, liters, litres, l;
+
+   dimension linear_velocity = 'length / time';
+   unit meter_per_second of linear_velocity = 'm / sec';
+   unit speed_of_light of linear_velocity conversion
+        2.9979250 * 10^8 meter_per_second variations velocity_of_light;
+
+   dimension mass_density = 'mass / length^3';
+   unit kilogram_per_cubicmeter of mass_density = 'kg / m^3';
+
+   dimension linear_acceleration = 'length / time^2';
+   unit meter_per_secondsquared of linear_acceleration = 'm / sec^2';
+
+   dimension angular_velocity = 'plane_angle / time';
+   unit radian_per_second of angular_velocity = 'rad / sec';
+
+   dimension angular_acceleration = 'plane_angle / time^2';
+   unit radian_per_secondsquared of angular_acceleration = 'rad / sec^2';
+
+   dimension concentration = 'substance / length^3';
+   unit mole_per_cubicmeter of concentration = 'mole / m^3';
+
+   dimension luminance = 'luminosity / length^2';
+   unit candel_per_squaremeter of luminance = 'candela / m^2';
+
+   dimension pressure = 'force / length^2';
+   unit pascal of pressure = 'newton / m^2' variations Pa, pascals;
+   unit standard_atmospheric_pressure of pressure
+        conversion 1.01325*10^5 pascal variations P0;
+
+   dimension magnetic_flux_density = 'magnetic_flux / length^2';
+   unit Tesla of magnetic_flux_density = 'Weber / m^2' variations T;
+   unit gauss of magnetic_flux_density conversion 10^-4 Tesla;
+
+   dimension admittance = 'current / potential'
+      variations conductance, susceptance;
+   unit Siemen of admittance = 'ampere / volt' 
+                               variations Siemens, Mho, Mhos;
+
+   dimension luminous_flux = 'luminosity * solid_angle';
+   unit lumen of luminous_flux = 'candela * steradian';
+
+   dimension illuminance = 'luminous_flux / length^2';
+   unit lux of illuminance = 'lumen / m^2';
+
+   dimension frequency = 'time^(-1)';  
+   unit Hertz of frequency = 'second^(-1)' variations Hz;
+                                     
+   dimension torque = 'force * length';
+   unit newton_metre of torque = 'newton * meter';
+
+   dimension viscosity = 'pressure * time';
+   unit pascal_second of viscosity = 'pascal * second';
+
+   dimension surface_tension = 'force / length';
+   unit newton_per_meter of surface_tension = 'newton / m';
+
+   dimension power_density = 'power / length^2';
+   unit watt_per_squaremeter of power_density = 'watt / m^2';
+
+   dimension energy_density = 'energy / length^3';
+   unit joule_per_cubicmeter of energy_density = 'joule / m^3';
+
+   dimension heat_capacity = 'energy / temperature';
+   unit joule_per_kelvin of heat_capacity = 'joule / kelvin';
+
+   dimension specific_heat_capacity = 'energy * (mass^(-1)) *
+                                      (temperature^(-1))';
+   unit joule_per_kilogramkelvin of specific_heat_capacity =
+        'joule * (kg^(-1)) * (kelvin^(-1))';
+
+   dimension thermal_conductivity = 'power * (length^(-1)) *
+                                    (temperature^(-1))';
+   unit joule_permeter_perdegree of thermal_conductivity =
+        'joule * (meter^(-1)) * (kelvin^(-1))';
+
+   dimension electric_field = 'potential / length'
+        variations electric_field_strength;
+   unit volt_per_meter of electric_field = 'volt / meter';
+
+   dimension magnetic_field = 'current / length'
+        variations magnetic_field_strength;
+   unit ampere_per_meter of magnetic_field = 'ampere / meter';
+
+   dimension electric_flux_density = 'charge / length^2';
+   unit coulomb_per_square_meter of electric_flux_density 
+        = 'coulomb / m^2';
+
+   dimension current_density = 'current / length^2';
+   unit ampere_per_square_meter of current_density = 'ampere / m^2';
+
+   dimension resistivity = 'resistance * length';
+   unit ohm_meter of resistivity = 'ohm * meter';
+
+   dimension permittivity = 'capacitance / length';
+   unit farad_per_meter of permittivity = 'farad / m';
+
+   dimension permeability = 'inductance / length';
+   unit henry_per_meter of permeability = 'henry / m';
+
+-- SI UNIT PREFIX MULTIPLIERS
+
+   multiplier yotta = 10.0e24;
+   multiplier zetta = 10.0e21;
+   multiplier exa = 10.0e18 variations E;
+   multiplier peta = 10.0e15 variations P;
+   multiplier tera = 10.0e12 variations T;
+   multiplier giga = 10e9 variations G;
+   multiplier mega = 10e6 variations M;
+   multiplier kilo = 10e3 variations k;
+   multiplier hecto = 10e2 variations h;
+   multiplier deca = 10e1 variations da;
+   multiplier deci = 10e-1 variations d;
+   multiplier centi = 10e-2 variations c;
+   multiplier milli = 10e-3 variations m;
+   multiplier micro = 10e-6 variations u;
+   multiplier nano = 10e-9 variations n;
+   multiplier pico = 10e-12 variations p;
+   multiplier femto = 10e-15 variations f;
+   multiplier atto = 10e-18 variations a;
+   multiplier zepto = 10e-21;
+   multiplier yocto = 10e-24;
+
+  type Bool = True | False ;
+
+  class Boolfunc (a) {
+    (&&), (||)              :: a -> a -> a;
+    not                     :: a -> a;
+    otherwise               :: a;  } ;
+
+  instance Boolfunc (Bool) {
+    True  && x              =  x;
+    False && x              =  False;
+    True  || x              =  True;
+    False || x              =  x;
+
+    not(True)               =  False;
+    not(False)              =  True;
+
+    otherwise               = True; };
+
+  instance Boolfunc (a -> b) {
+    (f && g) (x)            =  f(x) && g(x);
+    (f || g) (x)            =  f(x) || g(x);
+    (not (f)) (x)           =  not (f(x));
+    otherwise               =  \(x) -> otherwise;
+  } where Boolfunc (b) ;
+  type Char where {Eq(Char, Bool), Ord(Char, Bool), Ix(Char),
+            Enum(Char), Text(Char), Binary(Char)};
+
+  isAscii, isControl, isPrint, isSpace            :: Char -> Bool;
+  isUpper, isLower, isAlpha, isDigit, isAlphanum  :: Char -> Bool;
+
+  isAscii (c)             =  ord(c) < 128;
+  isControl(c)            =  c < ` ` || c == `\DEL`;
+  isPrint(c)              =  c >= ` ` && c <= `~`;
+  isSpace(c)              =  c == ` ` || c == `\t` || c == `\n` || 
+                             c == `\r` || c == `\f` || 
+                             c == `\v`;
+  isUpper(c)              =  c >= `A` && c <= `Z`;
+  isLower(c)              =  c >= `a` && c <= `z`;
+  isAlpha(c)              =  isUpper(c) || isLower(c);
+  isDigit(c)              =  c >= `0` && c <= `9`;
+  isAlphanum(c)           =  isAlpha(c) || isDigit(c);
+
+  toUpper, toLower        :: Char -> Char;
+  toUpper(c)| isLower(c)  =  chr (ord(c) - ord(`a`) + ord(`A`))
+            | otherwise   =  c;
+  
+  toLower(c)| isUpper(c)  =  chr (ord(c) - ord(`A`) + ord(`a`))
+            | otherwise   =  c;
+
+  type String = [Char];
+
+  lines         :: String -> [String];
+  lines("")     =  [];
+  lines(s)      =  l :- (if null (s) then [] else lines (tail(t)))
+                           where {(l, t) = break((==) (`\n`),s); } ;
+  
+  words         :: String -> [String];
+  words(s)              =  case dropWhile(isSpace,s) of {
+                        "" -> [];
+                        s1 -> w :- words(t)
+                where { (w, t) = break(isSpace(s)); } ; } ;
+  
+  unlines               :: [String] -> String;
+  unlines(ls)           = concat (map((\(l) -> l ++ "\n"),ls));
+  
+  unwords               :: [String] -> String;
+  unwords([])           = "";
+  unwords([w])          = w;
+  unwords((w:-ws))      = w ++ concat((map((:-) (` `)),ws));
+
+  error :: String -> a;
+  error = primitive "Abort";
+  type  ReadS (a) = String -> [(a,String)];
+  type  ShowS   = String -> String;
+  
+  class Text (a)  {
+      readsPrec :: Int -> ReadS (a);
+      showsPrec :: Int -> a -> ShowS;
+      readList  :: ReadS ([a]);
+      showList  :: [a] -> ShowS;
+  
+      readList    = readParen(False,
+       	 (\(r) -> [pr | ("[",s) <- [lex(r)], pr <- readl(s)]))
+        where {readl(s) = [([],t) | ("]",t) <- [lex(s)]] ++ readl1(s);
+               readl1(s) = [(x:-xs,v) | (x,t) <- reads(s),
+                          (xs,v) <- readl2 (lex(t))];
+               readl2((",",t)) = [z | z <- readl1(t)];
+               readl2(("]",t)) = [([],t)];
+               readl2(_) = []; };
+      showList (xs) = showChar(`[`) <> showl(xs)
+        where {showl([])    = showChar(`]`);
+               showl([x])   = shows(x) <> showChar(`]`);
+               showl (x:-xs) = shows(x) <> showChar(`,`) <> showl(xs); };
+      } ;
+  
+  reads 	        :: ReadS (a) where { Text (a) };
+  reads(s)              =  readsPrec(0,s);
+  
+  shows                 :: a -> ShowS where { Text (a) };
+  shows(s)              =  showsPrec(0,s);
+
+  showParen     :: Bool -> ShowS -> ShowS;
+  showParen(b,p)=  if b then showChar(`(`) <> p <> showChar(`)`) else p;
+
+  readParen     :: Bool -> ReadS (a) -> ReadS (a);
+  readParen(b,g)=  if b then mandatory else optional
+                   where { optional(r)  = g(r) ++ mandatory(r);
+                           mandatory(r) = 
+                              [(x,u) | ("(",s) <- [lex(r)],
+                                       (x,t)   <- optional(s),
+                                       (")",u) <- [lex(t)]   ]; } ;
+
+  lex             :: String -> (String,String);
+  lex("")         = ("","");
+  lex(''-'':-''>'':-s)= ("->",s);
+  lex(''-'':-s)     = ("-",s);
+  lex(r@(c:-s))   = 
+          if      isSpace(c)      then lex (dropWhile(isSpace(s)))
+          else if isAlpha(c)      then span(isIdChar(r))
+          else if isSingleSym(c)  then ([c],s)
+          else if c == '':''      then span(isMultiSymOrC(r))
+          else if isMultiSym(c)   then span(isMultiSym(r))
+          else if isDigit(c)      then lexNum(r)
+          else if c == ''\'''       then 
+                  let {(ch,t) = lexLitChar(s); ''\''' :- u = t; } in
+		  (''\''' :- ch ++ "'", u)
+          else if c == ''"''        then 
+                  let { (str,t) = lexString(s); } in
+		  (''"'':-str, t)
+          else error("Error in lex (PreludeText): bad character")
+    where {
+          isIdChar(c)        = isAlphanum(c) || c == ''_'' || c == ''\''';
+          isSingleSym(c)     = c ``in_op`` ",;()[]{}_";
+          isMultiSym(c)      = c ``in_op`` "!@#$%&*+-./<=>?\\^|~";
+          isMultiSymOrC(c)   = c == '':'' || isMultiSym(c);
+          lexNum(r) = (ds++f, t) where {(ds,s) = span(isDigit(r));
+                                       (f,t)  = lexFracExp(s); } ;
+          lexFracExp (''.'':-r) = (''.'':-ds++e, t)
+                                  where {(ds,s) = lexDigits(r);
+                                         (e, t) = lexExp(s); } ;
+          lexFracExp(s)       = ("",s);
+  
+          lexExp (''e'':-''-'':-r) = ("e-"++ds, s) 
+                 where { (ds,s) = lexDigits(r); } ;
+          lexExp (''e'':-r)     = (''e'':-ds, s)   
+                 where { (ds,s) = lexDigits(r); };
+          lexExp(s)           = ("",s);
+  
+          lexDigits(r@(dd:-_)) | isDigit(dd) = span(isDigit(r));
+  
+          lexString (''"'':-s)  = ("\"", s);
+          lexString (s)      = (ch++str, u)
+                               where{(ch,t)  = lexLitChar(s);
+                                     (str,u) = lexString(t); } ; } ;
+  
+  lexLitChar      :: String -> (String,String);
+  lexLitChar (`\\`:-s) = (`\\`:-esc, t)
+      where { (esc,t) = lexEsc(s);
+              lexEsc (c:-s) | c ``in_op`` "abfnrtv\\\"`&" = ([c],s);
+              lexEsc (`^`:-c:-s) | 
+                (isUpper(c) || c ``in_op`` "@[]^_\\") = ([`^`,c], s);
+              lexEsc (r@(dd:-s)) | isDigit(dd) = span(isDigit(r)); 
+              lexEsc (`o`:-s) = (`o`:-os, t)
+                     where { (os,t) = nonempty ( 
+                                      \(c) -> c >= `0` &&
+                                               c <= `7`, s) ; } ;
+              lexEsc (`x`:-s) = (`x`:-xs, t)
+                     where { (xs,t) = nonempty (
+                                      \(c) -> isDigit(c) ||
+                                             c >= `A` &&
+                                             c <= `F`, s); } ;
+              lexEsc (r@(c:-s)) | isSpace(c) = (sp++"\\", u)
+                                   where {
+                                   (sp,t) = span(isSpace(s));
+                                   (''\\'':-u) = t; } ; 
+  
+              lexEsc(s) =
+                if taketwo ``in_op`` doubles
+                then (taketwo, drop(2,s))
+                else if takethree ``in_op`` triples
+                then (takethree, drop(3,s))
+                else error(
+("Error in lex (PreludeText) Illegal literal escape sequence: " 
+  ++ takethree))
+   where { takethree = take(3,s);
+           taketwo   = take(2,s);
+           triples = ["NUL","SOH","STX","ETX","EOT","ENQ","ACK",
+                      "BEL","DLE","DC1","DC2","DC3","DC4","NAK",
+                      "SYN","ETB","CAN","SUB","ESC","DEL"];
+           doubles = ["BS","HT","LF","VT","FF","CR","SO","SI",
+                      "EM","FS","GS","RS","US","SP"];
+           nonempty(p,r@(c:-s)) | p(c) = span(p,r); }; };
+
+  lexLitChar (c:-s)    =  ([c],s);
+  
+  instance Text ([a]) {
+      readsPrec (p) = readList;
+      showsPrec (p) = showList;
+  } where Text (a);
+
+  instance Text (Integer) {
+      readsPrec = primitive "TextReadInteger";
+      showsPrec = primitive "TextShowInteger"; } ;
+
+  instance Text (Int) {
+      readsPrec = primitive "TextReadInt";
+      showsPrec = primitive "TextShowInt"; } ;
+
+  instance Text (Ratio) {
+      readsPrec = primitive "TextReadRatio";
+      showsPrec = primitive "TextShowRatio"; } ;
+
+  instance Text (Rational) {
+      readsPrec = primitive "TextReadRational";
+      showsPrec = primitive "TextShowRational"; } ;
+
+  instance Text (Float) {
+      readsPrec = primitive "TextReadFloat";
+      showsPrec = primitive "TextShowFloat"; } ;
+
+  instance Text (Polar (a)) {
+      readsPrec = primitive "TextReadPolar";
+      showsPrec = primitive "TextShowPolar"; } 
+  where { Text (a) };
+
+  instance Text (Phys (a)) {
+      readsPrec = primitive "TextReadPhysical";
+      showsPrec = primitive "TextShowPhysical"; } 
+  where { Text (a) };
+
+  instance Text (Char) {
+      readsPrec = primitive "TextReadChar";
+      showsPrec = primitive "TextShowChar"; } ;
+  type File (a) = File (a);
+  type IOResponse = Success | IOError (String);
+  type Bin;
+
+  readFile:: File (a) -> (IOResponse, a);
+  readfile = primitive "ReadFile";
+  writeFile:: a -> File (a) -> IOResponse;
+  writeFile = primitive "WriteFile";
+  
+  class  Binary  (a) {
+      readBin             :: Bin -> (a,Bin);
+      showBin             :: a -> Bin -> Bin; } ;
+
+  instance Binary (Int) {
+    showBin = primitive "ShowBinInt";
+    readBin = primitive "ReadBinInt"; } ;
+  
+  instance Binary (Integer) {
+    showBin = primitive "ShowBinInteger";
+    readBin = primitive "ReadBinInteger"; } ;
+  
+  instance Binary (Float) {
+    showBin = primitive "ShowBinFloat";
+    readBin = primitive "ReadBinFloat"; } ;
+  
+  instance Binary (Double) {
+    showBin = primitive "ShowBinDouble";
+    readBin = primitive "ReadBinDouble"; } ;
+  
+  instance Binary (Char) {
+    showBin (b) = (primitive "ShowBinInt") (ord (c), b);
+    readBin (b) = (chr (i,b1)) where {
+         (i,b1) = ((primitive "ReadBinSmallInt") (b),
+                 (primitive "MaxChar")); }; } ;
+  
+  instance Binary ([a]) {
+      showBin(l,b) = showBin ((length(l) :: Int), sb1(l,b)) where {
+        sb1([],b) = b;
+        sb1((h:-t),b) = showBin(h,(sb1(t,b))); };
+      readBin(bin) = rbl(len,bin1) where {
+         len :: Int;
+         (len,bin1) = readBin(bin);
+         rbl(0,b) = ([],b);
+         rbl(n,b) = (h:-t,b2) where {
+           (h,b1) = readBin(b);
+           (t,b2) = rbl((n-1),b1);}; };
+  } where Binary (a);
+  
+  instance Binary  (Array (a, b)) {
+      showBin(a) = showBin (bounds(a)) <> showBin (elems(a));
+      readBin(bin) = (listArray(b,vs), bin2)
+                 where {(b,bin1) = readBin(bin);
+                        (vs,bin2) = readBin(bin1); };
+  } where { Ix (a), Binary (a), Binary (b) };
+  
+  instance Binary (a,b) {
+    showBin((x,y)) = (showBin(x)) <> (showBin(y));
+    readBin(b) = ((x,y),b2) where {
+                  (x,b1) = readBin(b);
+                  (y,b2) = readBin(b1); };
+  } where { Binary (a), Binary (b) };
+  
+  instance Binary (a,b,c) {
+    showBin((x,y,z)) = (showBin(x)) <> (showBin(y)) <> (showBin(z));
+    readBin(b) = ((x,y,z),b3) where {
+                  (x,b1) = readBin(b);
+                  (y,b2) = readBin(b1);
+                  (z,b3) = readBin(b2); };
+  }  where { Binary (a), Binary (b), Binary (c) };
+  
+  instance Binary (a,b,c,e) {
+    showBin((a,b,c,e)) = (showBin(a)) <> (showBin(b)) <> 
+                        (showBin(c)) <> (showBin(e));
+    readBin(b) = ((a1,a2,a3,a4),b4) where {
+                  (a1,b1) = readBin(b);
+                  (a2,b2) = readBin(b1);
+                (a3,b3) = readBin(b2);
+                (a4,b4) = readBin(b3); };
+  } where { Binary (a), Binary (b), Binary (c), Binary (e) };
+class Functor (f) {
+    map :: (a -> b) -> (f (a) -> f (b)) ; } ;
+
+class Monad (m) {
+    result      :: a -> m (a) ;
+    join        :: m (m (a)) -> m (a) ;
+    bind        :: m (a) -> (a -> m (b)) -> m (b) ;
+
+    join (x)     = bind (x, id)  ;
+    x ``bind`` f = join (map (f, x)) ;
+  } where Functor (m);
+
+class Monad0 (m) {
+    zero   :: m (a);
+  } where Monad (m);
+
+class MonadPlus (c) {
+    (++) :: c (a) -> c (a) -> c (a) ;
+  } where Monad0 (c);
+
+filter		 :: (a -> Bool) -> m (a) -> m (a) where Monad0 (m);
+filter (p, xs)    = [ x | x<-xs, p (x) ] ;
+  type List (a) = a :- List (a) | Nil ;
+
+  head                    :: [a] -> a;
+  head (x:-_)              =  x;
+  head([]) = error("Error in function head: head of []");
+
+  tail                    :: [a] -> [a];
+  tail (_:-xs)             =  xs;
+  tail([]) =  error("Error in function tail: tail of []");
+
+  null                    :: [a] -> Bool;
+  null([])                =  True;
+  null (_:-_)             =  False;
+
+  instance Functor (List) {
+    map (f, [])           = [];
+    map (f, x:-xs)        = f(x) :- map (f, xs); } ;
+
+  instance Monad (List) {
+    result (x)            = [x];
+    []     ``bind`` f     = [];
+    (x:-xs) ``bind`` f    = f(x) ++ (xs ``bind`` f); } ;
+
+  instance Monad0 (List) {
+    zero                  = [] ; } ;
+
+  instance MonadPlus (List) {
+    []      ++ ys         = ys;
+    (x:-xs) ++ ys         = x :- (xs ++ ys) ; } ;
+
+  length :: [b] -> Int;
+  length(x) = genericLength(x);
+
+  genericLength :: [b] -> a where { Integers (a) };
+  genericLength(xs) = len(0,xs) where {
+          len(n,[])     = n;
+          len(n,(x:-xs))= len((n + 1),xs); };
+
+  sort :: [a] -> [a] where { Ord (a, Bool) };
+  sort = primitive "GeneralSort" ;
+
+  foldr                   :: (a -> b -> b) -> b -> [a] -> b;
+  foldr(f,z,[])           =  z;
+  foldr(f,z,(x:-xs))      =  f(x,(foldr(f,z,xs)));
+
+  foldl                   :: (a -> b -> a) -> a -> [b] -> a;
+  foldl(f,z,[])           =  z;
+  foldl(f,z,(x:-xs))      =  foldl(f,(f(z,x)),xs);
+
+  foldr1                  :: (a -> a -> a) -> [a] -> a;
+  foldr1(f,[x])           =  x;
+  foldr1(f,(x:-xs))       =  f(x,(foldr1(f,xs)));
+
+  foldl1                  :: (a -> a -> a) -> [a] -> a;
+  foldl1(f,(x:-xs))       =  foldl(f(x),xs);
+
+  repeat                  :: a -> [a];
+  repeat(x)               =  xs where { xs = x:-xs; };
+
+  take                    :: a -> [b] -> [b] where Integers (a);
+  take (_,    [])         =  [];
+  take (0,    _)          =  [];
+  take((n+1),(x:-xs))     =  x :- take(n,xs);
+
+  drop                    :: a  -> [b] -> [b] where Integers (a);
+  drop (_,    [])         =  [];
+  drop (0,    xs)         =  xs;
+  drop((n+1),(_:-xs))     =  drop(n,xs);
+
+  takeWhile               :: (a -> Bool) -> [a] -> [a];
+  takeWhile(p,[])         =  [];
+  takeWhile(p,(x:-xs)) 
+              | p(x)      =  x :- takeWhile(p,xs)
+              | otherwise =  [];
+
+  dropWhile               :: (a -> Bool) -> [a] -> [a];
+  dropWhile(p,[])         =  [];
+  dropWhile(p,xs@(x:-xs1))
+              | p(x)      =  dropWhile(p,xs1)
+              | otherwise =  xs;
+
+  span, break             :: (a -> Bool) -> [a] -> ([a],[a]);
+  span(p,xs)              =  (takeWhile(p,xs), dropWhile(p,xs));
+  break(p)                =  span (not <> p);
+
+  in_op                   :: a -> [a] -> Bool where { Eq (a, Bool) };
+  x ``in_op`` []          =  False;
+  x ``in_op`` (y:-ys)     =  x == y || x ``in_op`` ys;
+
+  reverse                 :: [a] -> [a];
+  reverse                 =  foldl((\(xs, x) -> x:-xs),[]);
+
+  and, or                 :: [Bool] -> Bool;
+  and                     =  foldr((&&),True);
+  or                      =  foldr((||),False);
+
+  concat                  :: [[a]] -> [a];
+  concat                  =  foldr((++),[]);
+
+  zip                     :: [a] -> [b] -> [(a,b)];
+  zip                     =  zipWith (\(a, b) -> (a,b));
+
+  zip3                    :: [a] -> [b] -> [c] -> [(a,b,c)];
+  zip3                    =  zipWith3 (\(a, b, c) -> (a,b,c));
+
+  zipWith                 :: (a->b->c) -> [a]->[b]->[c];
+  zipWith(z,(a:-aas),(b:-bs))=  z(a,b) :- zipWith(z,aas,bs);
+  zipWith(_,_,_)          =  [];
+
+  zipWith3                :: (a->b->c->e) -> [a]->[b]->[c]->[e];
+  zipWith3(z,(a:-aas),(b:-bs),(c:-cs))
+                          =  z(a,b,c) :- zipWith3(z,aas,bs,cs);
+  zipWith3(_,_,_,_)       =  [];
+
+  last                    :: [a] -> a;
+  last([x])               =  x;
+  last((_:-xs))           =  last(xs);
+  last([]) = error("Error in function last (PreludeList): last of []");
+
+  init                    :: [a] -> [a];
+  init([x])               =  [];
+  init((x:-xs))           =  x :- init(xs);
+  init([]) = error("Error in function init (PreludeList): init of []");
+
+  (!!)                    :: [b] -> a -> b where Integers (a);
+  x !! n   | n < 0 = error ("Error in function !! (PreludeList): n < 0")
+           | otherwise = idx(x,n) where {
+     idx([],_) = error("Error in function !! (PreludeList): end of list");
+               idx((x:-_),0) = x;
+               idx((_:-xs),(n+1)) = idx(xs,n); } ;
+
+  scanl                   :: (a -> b -> a) -> a -> [b] -> [a];
+  scanl(f,q,xs)           =  q :- (case xs of {
+                                  []   -> [];
+                                  x:-xs -> scanl(f,(f(q,x)),xs); } );
+
+  scanl1                  :: (a -> a -> a) -> [a] -> [a];
+  scanl1(f,(x:-xs))        =  scanl(f(x),xs);
+
+  scanr                   :: (a -> b -> b) -> b -> [a] -> [b];
+  scanr(f,q0,[])          =  [q0];
+  scanr(f,q0,(x:-xs))     =  f(x,q) :- qs
+                             where { qs@(q:-_) = scanr(f,q0,xs); } ;
+
+  scanr1                  :: (a -> a -> a) -> [a] -> [a];
+  scanr1(f, [x])          =  [x];
+  scanr1(f, (x:-xs))      =  f(x,q) :- qs
+                             where {qs@(q:-_) = scanr1(f,xs); } ;
+
+  splitAt                 :: a -> [b] -> ([b],[b]) where Integers (a);
+  splitAt (0,    xs)      =  ([],xs);
+  splitAt (_,    [])      =  ([],[]);
+  splitAt((n+1),(x:-xs))  =  (x:-xs1,xs2) 
+                             where {(xs1,xs2) = splitAt(n,xs); };
+
+  nub                     :: [a] -> [a] where { Eq (a, Bool) };
+  nub([])                 =  [];
+  nub((x:-xs))            =  x :- nub (filter((/=) (x),xs));
+
+  scan                    :: (a -> b -> a) -> a -> [b] -> [a];
+  scan(f,q,xs)            =  q :- case xs of {
+                                  []   -> [];
+                                  x:-xs -> scan(f,(f(q,x)),xs); } ;
+
+  iterate                 :: (a -> a) -> a -> [a];
+  iterate(f,x)            =  x :- iterate(f,f(x));
+
+  cycle                   :: [a] -> [a];
+  cycle(xs)               =  xs1 where { xs1 = xs ++ xs1; };
+
+  partition :: (a -> Bool) -> [a] -> ([a],[a]);
+  partition(p,xs) = part(p,xs,([], [])) where {
+          part(_,[],res) = res;
+          part(p,(x:-xs),(left, right)) 
+                 | p(x) = part(p,xs,(x:-left, right))
+                 | otherwise = part(p,xs,(left, x:-right)) ;} ;
+
+  sum, product            :: [a] -> a where { Group (a), Mult (a,a) };
+  sum(x)                  =  foldl((+),0,x);
+  product(x)              =  foldl((*),1,x);
+
+  -- sums and products give a list of running sums or products from
+  -- a list of numbers.  For example,  sums [1,2,3] == [0,1,3,6].
+  sums, products          :: [a] -> [a] where { Group (a), Mult (a,a) };
+  sums(x)                 =  scanl((+),0,x);
+  products(x)             =  scanl((*),1,x);
+
+  maximum, minimum        :: [a] -> a where { Ord (a, Bool) };
+  maximum(x)              =  foldl1(max,x);
+  minimum(x)              =  foldl1(min,x);
+
+  any, all                :: (a -> Bool) -> [a] -> Bool;
+  any(p)                  =  or <> map (p);
+  all(p)                  =  and <> map (p);
+
+  -- elem is the list membership predicate, usually written in infix form,
+  -- e.g., x ``elem`` xs.  notElem is the negation.
+  elem, notElem           :: a -> [a] -> Bool where { Eq (a, Bool) };
+  elem(x,y)               =  (any <> (==))(x,y);
+  notElem(x,y)            =  (all <> (/=))(x,y);
+
+  transpose               :: [[a]] -> [[a]];
+  transpose(x)            =  foldr 
+                               (\(xs,xss) -> zipWith 
+                                   ((:-) (xs,(xss ++ repeat ([])))),
+                               [],x);
+
+  zip4            :: [a] -> [b] -> [c] -> [e] -> [(a,b,c,e)];
+  zip4            =  zipWith4 (\(a,b,c,e) -> (a,b,c,e));
+
+  zip5            :: [a] -> [b] -> [c] -> [e] -> [f] -> [(a,b,c,e,f)];
+  zip5            =  zipWith5 (\(a,b,c,e,f) -> (a,b,c,e,f));
+
+  zip6            :: [a] -> [b] -> [c] -> [e] -> [f] -> [g]
+                     -> [(a,b,c,e,f,g)];
+  zip6            =  zipWith6 (\(a,b,c,e,f,g) -> (a,b,c,e,f,g));
+
+  zip7            :: [a] -> [b] -> [c] -> [e] -> [f] -> [g] -> [h]
+                     -> [(a,b,c,e,f,g,h)];
+  zip7            =  zipWith7 (\(a,b,c,e,f,g,h) -> (a,b,c,e,f,g,h));
+
+  zipWith4        :: (a->b->c->e->f) -> [a]->[b]->[c]->[e]->[f];
+  zipWith4(z,(a:-aas),(b:-bs),(c:-cs),(e:-es))
+                  =  z(a,b,c,e) :- zipWith4(z,aas,bs,cs,es);
+  zipWith4 (_,_,_,_)      =  [];
+
+  zipWith5        :: (a->b->c->e->f->g)
+                     -> [a]->[b]->[c]->[e]->[f]->[g];
+  zipWith5(z,(a:-aas),(b:-bs),(c:-cs),(e:-es),(f:-fs))
+                  =  z(a,b,c,e,f) :- zipWith5(z,aas,bs,cs,es,fs);
+  zipWith5 (_,_,_,_,_,_)    =  [];
+
+  zipWith6        :: (a->b->c->e->f->g->h)
+                     -> [a]->[b]->[c]->[e]->[f]->[g]->[h];
+  zipWith6(z,(a:-aas),(b:-bs),(c:-cs),(e:-es),(f:-fs),(g:-gs))
+                  =  z(a,b,c,e,f,g) :- zipWith6(z,aas,bs,cs,es,fs,gs);
+  zipWith6 (_,_,_,_,_,_,_) =  [];
+
+  zipWith7        :: (a->b->c->e->f->g->h->i)
+                     -> [a]->[b]->[c]->[e]->[f]->[g]->[h]->[i];
+  zipWith7(z,(a:-aas),(b:-bs),(c:-cs),(e:-es),(f:-fs),(g:-gs),(h:-hs))
+             =  z(a,b,c,e,f,g,h) :- zipWith7(z,aas,bs,cs,es,fs,gs,hs);
+  zipWith7 (_,_,_,_,_,_,_,_) =  [] ;
+
+  instance Eq ([a], Bool) {
+    [] == [] = True;
+    (a:-b) == (c:-e) = a == c && b == e;
+    _ == _ = False; } 
+  where { Eq (a, Bool) };
+  
+  instance Ord ([a], Bool) {
+    [] <= _ = True;
+    _ <= [] = False;
+    (a:-b) <= (c:-e) = a < c || a == c && b <= e; 
+    
+    _ < [] = False;
+    [] < _ = True;
+    (a:-b) < (c:-e) = a < c || a == c && b < e; } 
+  where { Ord (a, Bool) };
+  type Assoc (a, b) = a := b;
+  type Array (a, b) = MkArray ((a,a), a -> b) where Ix (a);
+
+  makearray     :: (a,a) -> [Assoc (a, b)] -> Array (a, b) where Ix (a);
+  bounds        :: Array (a, b) -> (a,a) where Ix (a);
+  (%%)          :: Array (a, b) -> [Assoc (a, b)] -> Array (a, b) 
+                   where Ix (a);
+  accum         :: (b -> c -> b) -> Array (a, b) -> 
+                             [Assoc (a, c)] -> Array (a, b) where Ix (a);
+  listArray     :: (a,a) -> [b] -> Array (a, b) where Ix (a);
+  indices       :: Array (a, b) -> [a] where Ix (a);
+  elems         :: Array (a, b) -> [b] where Ix (a);
+  assocs        :: Array (a, b) -> [Assoc (a, b)] where Ix (a);
+  accumArray    :: (b -> c -> b) -> b -> (a,a) -> 
+                            [Assoc (a, c)] -> Array (a, b) where Ix (a);
+  amap          :: (b -> c) -> Array (a, b) -> Array (a, c) where Ix (a);
+  ixmap         :: (a,a) -> (a -> b) -> Array (b, c)
+                             -> Array (a, c) where { Ix (a), Ix (b) };
+  update        :: a -> b -> Array (a, b) -> Array (a, b) where Ix (a);
+
+  instance Function (Array) {
+    apply (MkArray (_, f)) = f; } ;
+
+  bounds (MkArray (b, _))  = b;
+
+  makearray (b, ivs) =
+    if and ([inRange (b, i) | i:=_ <- ivs]) then
+       MkArray (b, 
+         \(j) -> case [v | (i := v) <- ivs, i==j] of {
+                       [v] -> v;
+                       [] -> error ("Error in array application:\
+                                    \undefined array element");
+                       _  -> error ("Error in array application:\
+                                    \multiply defined array element"); } )
+      else error ("Error in array building: out of range index");
+
+  indices = range <> bounds;
+
+  a %% us   = makearray (bounds (a), 
+              [i := a (i) | i <- indices (a) %% [i | i:=_ <- us]]
+               ++ us);
+
+  accum (f) = foldl (\(a, (i:=v)) -> a %% [i := f(a(i),v)]);
+
+  listArray (b, vs) = makearray (b, zipWith ((:=), range (b), vs));
+
+  elems (a)               = [a(i) | i <- indices (a)];
+
+  assocs (a)              = [i := a(i) | i <- indices (a)];
+
+  accumArray (f, z, b)    = accum (f, (makearray (b, 
+                                       [i := z | i <- range (b)])));
+
+  amap (f, a)             = makearray (b, [i := f (a(i)) | i <- range (b)])
+                             where { b = bounds (a); };
+
+  ixmap (b, f, a)         = makearray (b, [i := a (f(i)) | i <- range (b)]);
+
+  update (i, val, a)      = makearray (b, [j := ua (j)   | j <- range (b)])
+                            where {b = bounds (a);
+                                   ua (j) = if i==j then val else a(j);} ;
+
+  type StArray (a, b, c) = Array (b, c) -> (a, Array (b, c))
+    where Ix (a);
+
+  instance Functor (StArray (a, b, c)) {
+    map (f, arr)   = arr ``bind`` (\(x) -> result (f (x)));
+  } where Monad (StArray (a, b, c));
+
+  instance Monad (StArray (a, b, c))  {
+    result (arr)   = \(x) -> (arr, x);
+    arr ``bind`` k  = \(x) -> let { (d, y) = arr (x); } in
+                            let { (e, z) = k(d, y); } in
+                            (e, z) ; } ;
+
+  newarray::(b,b) -> [c] -> StArray (a, b, c) -> a;
+  newarray (val, bnds, lst) = let {(res, x) = result (listArray (bnds,lst));}
+                              in res;
+
+  fetch::b -> StArray (a, b, c);
+  fetch (i)  =  \(x) -> (x(i), x);
+
+  assign:: b -> c -> StArray ( (), b, c);
+  assign (i, val) = \(x) -> ((), update (i, val, x));
+
+  instance Eq (Array (a, b), Bool) {
+      a == a1           =  assocs (a) == assocs (a1);
+  } where { Ix (a), Eq (b, Bool) };
+
+  instance Ord (Array (a, b), Bool) {
+      a <=  a1                  =  assocs (a) <=  assocs (a1);
+  } where { Ix (a), Ord (b, Bool) };
+
+  instance Text (Array (a, b)) {
+      showsPrec (p, a) = showParen (p > 9, 
+                         showString ("array ") <>
+                         shows (bounds (a)) <> showChar (` `) <>
+                         shows (assocs (a)));
+
+      readsPrec (p) = readParen (p > 9,
+           (\(r) -> [(makearray (b, aas), u) | ("array",s) <- [lex (r)],
+                                          (b,t)       <- reads (s),
+                                          (aas,u)      <- reads (t) ]
+                  ++
+            [(listArray (b, xs), u) | ("listArray",s) <- [lex (r)],
+                                     (b,t)           <- reads (s),
+                                     (xs,u)          <- reads (t) ]));}
+  where { Ix (a), Text (a), Text (b) };
+
+  instance Binary (Array (a, b)) {
+      showBin (a) = showBin (bounds (a)) <> showBin (elems (a));
+
+      readBin (bin) = (listArray (b, vs), bin2)
+                 where { (b,bin1)   = readBin (bin);
+                         (vs,bin2) = readBin (bin1); };
+  } where { Ix (a), Binary (a), Binary (b) };
+
+  instance Eq (Assoc (a1, a2), Bool) {
+    (a1 := a2) == (z1 := z2) = a1==z1 && a2==z2;
+    _ == _ = False; } 
+  where { Eq (a1, Bool), Eq (a2, Bool) };
+
+  instance Ord (Assoc (a1, a2), Bool) {
+    (a1 := a2) <= (z1 := z2) = a1<=z1 || a1==z1 && a2<=z2 ;
+    (a1 := a2) <  (z1 := z2) = a1<z1  || a1==z1 && a2<z2;
+  } where { Ord (a1, Bool), Ord (a2, Bool) };
+
+  instance Text (Assoc (a1, a2)) {
+    showsPrec (dd, (a1 := a2)) =
+      showParen (dd > 5,
+                showsPrec (6, a1) <> showString (" := ") <> 
+                showsPrec (6, a2));
+
+    readsPrec (p)  =  readParen (p > 5,
+                      (\(r) -> [(x:=y,u) | (x,s)   <- reads (r),
+                                         (":=",t) <- [lex (s)],
+                                         (y,u)   <- reads (t)]));
+  } where { Text (a1), Text (a2) };
+  type Gmatrix (a, b, c) = Array (a, Array (b, c)) where { Ix (a), Ix (b)};
+  type Matrix (a) = Gmatrix (Int, Int, a);
+  type Vector (a) = Array (Int, a);
+
+
+  instance Group (Gmatrix (a, b, c))  {
+    m + n = makearray (bounds (m), 
+                   [ i := makearray (bounds (m(i)), 
+                          [ j := m(i,j) + n(i,j) | j <- indices(m(i))])
+                   | i <- indices (m)]);
+    m - n = makearray (bounds (m), 
+                   [ i := makearray (bounds (m(i)), 
+                          [ j := m(i,j) - n(i,j) | j <- indices(m(i))])
+                   | i <- indices (m)]);
+  }   where Group (c);
+
+  instance Mult (Gmatrix (a, b, c), Gmatrix (a, b, c)) {
+    m * n = makearray (bounds (m), 
+                   [ i := makearray (bounds (n(i)),
+                       [ j := sum ([m(i,k)*n(k,j) | k <- indices(m(i))])
+			| j <- indices(n(i))])
+                   | i <- indices (m)]);
+  } where Mult (c, c);
+
+  instance Mult (b, Array (a, b)) {
+    x * a = makearray (bounds (a), [i := x * a(i) | i <- indices (a)]);}
+  where Mult (b, b);
+
+  instance Mult (c, Gmatrix (a, b, c)) {
+    x * m = makearray (bounds (m), [i := x * m(i) | i <- indices (m)]);}
+  where Mult (c, Array (b, c));
+                   
+
+  instance Scale (Array (a, b), b) {
+    scaled_value (x, y) = Array (bounds (x),
+                              [ i := scaled_value(x(i),y) |
+                                i <- indices(x) ]);
+    offset_value (x, y) = Array (bounds (x),
+                              [ i := offset_value(x(i),y) |
+                                i <- indices(x) ]);
+  } where { Ix (a), Scale (b) };
+
+  trans::matrix(a,b,c) -> matrix(b,a,c) where { Ix (a), Ix (b) };
+  trans (m) = Array (bounds (n),
+                    [i := Array (bounds(m), 
+                                [ j := m(j,i) | j <- indices(n)])
+                   | i <- indices(m) ])
+              where { (a,b) = bounds(m); n = m(a); } ;
+
+  conj_trans :: matrix(a,b,c) -> matrix(b,a,c) 
+                where { Ix (a), Ix (b), Complex (c) };
+  conj_trans (m) = Array (bounds (n),
+                         [i := Array (bounds(m), 
+                                     [ j := conjugate(m(j,i)) 
+                                     | j <- indices(n)])
+                        | i <- indices(m) ])
+                   where { (a,b) = bounds(m); n = m(a); } ;
+  class Exception (a) {
+    normal:: a -> Bool;
+  } where Monad (a);
+
+  type GenExcpt (a) = GenNorm (a) | GenException;
+
+  instance Functor (GenExcpt (a)) {
+    map ( f, GenNorm (a))  = GenNorm (f (a));
+    map ( f, GenException) = GenException; } ;
+
+  instance Monad (GenExcpt (a)) {
+    result (x)                    = GenNorm (x);
+    join (GenNorm (GenNorm (x)))  = GenNorm (x);
+    join (GenNorm (GenException)) = GenException;
+    join (GenException)           = GenException; } ;
+  attribute layout: Topology;
+
+  type Topology = Ver (Vertex) | Edg (Edge) | Pat (Path) | Lp (Loop) |
+                  Fac (Face) | Sbfac (Subface) | Sh (Shell) | 
+                  CES (ConnectedEdgeSet) | CFS (ConnectedFaceSet) ;
+
+  type Vertex = D2 (Float, Float) | D3 (Float, Float, Float);
+
+  type Edge = Edge (edge_start (Vertex), edge_end (Vertex));
+
+  type Path = Path ([Edge]);
+
+  type Loop = VerLoop (VertexLoop) | EdgLoop (EdgeLoop) |
+              PolLoop (PolyLoop) ;
+
+  type VertexLoop = Vertex;
+
+  type EdgeLoop = [ Edge ];
+
+  type PolyLoop = [ Vertex ];
+
+  type Face = Face (outer_bound (Loop), other_bounds ([Loop]));
+
+  type Subface = Subface (outer (Loop), other ([Loop]));
+
+  type Shell = VerShell (VertexShell) | WrShell (WireShell) |
+               OpShell (OpenShell) | ClShell (ClosedShell) ;
+
+  type VertexShell = VertexLoop;
+
+  type WireShell = [ EdgeLoop ] ;
+
+  type OpenShell = [ Face ] ;
+
+  type ClosedShell = [ Face ] ;
+
+  type ConnectedEdgeSet = [ Edge ] ;
+
+  type ConnectedFaceSet = [ Face ] ;
+  class Usig (f) { 
+    delay           :: f(a) -> a -> f(a) where Real (a);
+    sigEq           :: f(a) -> f(a) -> a -> Bool where Real (a);
+    sigLt           :: f(a) -> f(a) -> a -> Bool where Real (a);
+    sigLe           :: f(a) -> f(a) -> a -> Bool where Real (a);
+    sigGt           :: f(a) -> f(a) -> a -> Bool where Real (a);
+    sigGe           :: f(a) -> f(a) -> a -> Bool where Real (a);
+
+    (delay (f, d)) (x) = f (x + d);
+    (sigEq (f, g)) (x) = f(x) == g(x);
+    (sigLt (f, g)) (x) = f(x) <  g(x);
+    (sigLe (f, g)) (x) = f(x) <= g(x);
+    (sigGt (f, g)) (x) = f(x) >  g(x);
+    (sigGe (f, g)) (x) = f(x) >= g(x); 
+  } where Function (f) ;
+
+  type Funcsig (b, c) = MHDL_Function (b, c) 
+       where { Real (b), Real (c) };
+
+  instance Eq (Funcsig (a, b) , a -> Bool) {
+    (==)                =  sigEq; } ;
+
+  instance Ord (Funcsig (a, b), a -> Bool) {
+    (<)                 =  sigLt;
+    (<=)                =  sigLe;
+    (>=)                =  sigGt;
+    (>)                 =  sigGe; } ;
+
+  instance Group (Funcsig (a, b)) {
+    (f + g) (x)         =  f(x) + g(x);
+    (f - g) (x)         =  f(x) - g(x); } ;
+
+  instance Num (Funcsig (a, b)) {
+    (negate (f)) (x)  =  negate (f(x));
+    (abs (f)) (x)     =  abs (f(x));
+    (signum (f)) (x)  =  signum (f (x)); } ;
+
+  instance Mult (Funcsig (a, b), Funcsig (a, b)) {
+    (f * g) (x)         =  f(x) * g(x); } ;
+
+  instance Fractional (Funcsig (a, b)) {
+    (f / g) (x)         =  f(x) / g(x) ; } ;
+
+  instance Real (Funcsig (a, b)) {
+    pi (x)              =  pi;
+    (exp (f)) (x)         =  exp (f (x));
+    (log (f)) (x)         =  log (f (x));
+    (sqrt (f)) (x)        =  sqrt (f (x));
+    (sin (f)) (x)         =  sin (f (x));
+    (cos (f)) (x)         =  cos (f (x));
+    (tan (f)) (x)         =  tan (f (x));
+    (asin (f)) (x)        =  asin (f (x));
+    (acos (f)) (x)        =  acos (f (x));
+    (atan (f)) (x)        =  atan (f (x));
+    (sinh (f)) (x)        =  sinh (f (x));
+    (cosh (f)) (x)        =  cosh (f (x));
+    (tanh (f)) (x)        =  tanh (f (x));
+    (asinh (f)) (x)       =  asinh (f (x));
+    (acosh (f)) (x)       =  acosh (f (x));
+    (atanh (f)) (x)       =  atanh (f (x)); } ;
+
+  instance Usig (Funcsig);
+  class Cont (f) {
+    Laplace      :: f (time, a) -> f (b, a) where {Real (a), Complex (b)};
+    InvLaplace   :: f (b, a) -> f (time, a) where {Real (a), Complex (b)};
+    Fourier      :: f (time, a) -> f (frequency, a) where Real (a);
+    InvFourier   :: f (frequency, a) -> f (time, a) where Real (a);
+  } where Usig (f);
+
+  instance Cont (Funcsig) {
+    Laplace = primitive "FuncsigLaplace";
+    InvLaplace = primitive "FuncsigInverseLaplace";
+    Fourier = primitive "FuncsigFourier";
+    InvFourier = primitive "FuncsigInfFourier"; } ;
+  class Disc (f) {
+    next_samp:: f(a, b) -> (b, f(a, b)) where {Real (a), Real (b)};
+    next_time:: f(a, b) -> (a, f(a, b)) where {Real (a), Real (b)};
+    summation:: f(a, b) -> a -> a -> b where {Real (a), Real (b)};
+    z_trans  :: f(time, b) -> f(frequency, b) where Real (b);
+    inv_ztrans:: f(frequency, b) -> f(time, b) where Real (b);
+  } where Usig (f);
+  class Per (f)  {
+    freq:: f(a) -> frequency where Real (a);
+    phase:: f(a) -> plane_angle where Real (a);
+    mkPer:: frequency -> plane_angle -> a -> f (a) where Real (a);
+  } where Usig (f);
+  class ContPer (f) {
+    pshift:: f(a, b) -> plane_angle -> f (a, b) where {Real (a), Real(b)};}
+  where { Per (f), Cont (f) } ;
+  class DiscPer (f) {
+    FFT::    f (time, a) -> f(frequency, a) where Real (a);
+    invFFT:: f (frequency, a) -> f(time, a) where Real (a);
+  } where { Disc (f), Per (f) };
+  class Function (f) {
+    apply:: f(a, b) -> a -> b; } ;
+
+
+  (<>):: (b -> c) -> (a -> b) -> a -> c;
+  f <> g = \(x) -> f (g (x)); 
+
+  type MHDL_Function (a, b) = MHDL_Function (a, b);
+  instance Function (MHDL_Function) {
+    apply = primitive "ApplyMHDLFunction"; } ;
+  coercion IntegertoInt:: Integer -> Int;
+  IntegertoInt = primitive "IntegertoInt";
+
+  coercion InttoInteger:: Int -> Integer;
+  InttoInteger = primitive "InttoInteger";
+
+  coercion InttoRatio:: Int -> Ratio;
+  InttoRatio = primitive "InttoRatio";
+
+  coercion IntegertoRational:: Integer -> Rational;
+  IntegertoRational = primitive "IntegertoRational";
+
+  coercion InttoFloat:: Int -> Float;
+  InttoFloat = primitive "InttoFloat";
+
+  coercion IntegertoFloat:: Integer -> Float;
+  IntegertoFloat = primitive "IntegertoFloat";
+
+  coercion RatiotoFloat:: Ratio -> Float;
+  RatiotoFloat = primitive "RatiotoFloat";
+
+  coercion RatiotoRational:: Ratio -> Rational;
+  RatiotoRational = primitive "RatiotoRational";
+
+  coercion RationaltoRatio:: Rational -> Ratio;
+  RationaltoRatio = primitive "RationaltoRatio";
+
+  coercion RationaltoFloat:: Rational -> Float;
+  RationaltoFloat = primitive "RationaltoFloat";
+
+  ApproxRationaltoRatio:: Rational -> Ratio;  -- Allows loss of information
+  ApproxRationaltoRatio = primitive "ApproxRationaltoRatio"; 
+
+  coercion FloattoExtnum:: Float -> Extnum (Float);
+  FloattoExtnum (x) = numeric (x);
+
+  FloattoRatio:: Float -> Ratio;
+  FloattoRatio = primitive "FloattoRatio";
+
+  FloattoInteger:: Float -> Integer;
+  FloattoInteger = primitive "FloattoInteger";
+
+  RectangtoPolar:: Rectang (a) -> Polar (a);
+  RectangtoPolar (p) = mkPolar (cmag (p), cphase(p));
+
+  coercion PolartoRectang:: Polar (a) -> Rectang (a);
+  PolartoRectang (p) = mkRectang (realPart (p), imagPart (p));
+
+  coercion toPhys :: a -> Phys (a) where {Real (a), Scale (a, a)};
+  toPhys = primitive "toPhysical";
+
+  coercion PhystoTimeFunction:: Phys (a) -> Time_dim (a) -> Phys (a);
+  PhystoTimeFunction (p) = \(t) -> p;
+
+  chr             :: Integer -> Char;
+  chr             = primitive "primIntegertoChar";
+
+  id              :: a -> a;
+  id (x)          = x;
+
+  gcd             :: a -> a-> a where Integers (a);
+  gcd (0, 0)      =  error("gcd: gcd (0,0) is undefined");
+  gcd (x, y)      =  gcd1 (abs (x), abs (y))
+                     where { gcd1 (x, 0) = x;
+                             gcd1 (x, y) = gcd1 (y, (x ``mod`` y)); } ;
+
+  lcm             :: a -> a-> a where Integers (a);
+  lcm (_, 0)      =  0;
+  lcm (0, _)      =  0;
+  lcm (x, y)      =  abs ((x ``div`` (gcd (x, y))) * y);
+
+  (^*)             :: a -> b -> a where { Num (a), Integers (b) };
+  x^*0             =  1;
+  x^*(n+1) | n>=0  =  f (x, n, x) 
+           | otherwise = error ("Error in ^*: Negative exponent found")
+		where {
+                        f (_, 0, y) = y;
+                        f (x, n, y) = g (x, n)  where {
+                           g (x, n) | even (n)  = g ((x*x), (n``div``2))
+                                    | otherwise = f (x, (n-1), (x*y)); }; };
+
+  (^^)            :: a -> b -> a where { Fractional (a), Integers (b) };
+  x ^^ n          =  if n >= 0 then x^n else 1/x^(-n);
+
+
+  (%)                     :: a -> a -> Ratio (a) where Integers (a);
+  numerator, denominator  :: Ratio (a) -> a where Integers (a);
+
+  numerator (x//y)        =  x;
+
+  denominator (x//y)      =  y;
+
+  x % y                   =  reduce ((x * signum (y)), (abs (y)));
+
+  reduce (x, y)           =  (x ``div`` z) // (y ``div`` z)
+                             where { z = gcd (x, y); };
+
+  max, min :: a -> a -> a where Ord(a, Bool);
+
+  max(x,y)| x >= y    =  x
+          | y >= x    =  y;
+
+  min(x,y)| x <= y    =  x
+          | y <= x    =  y;
+
+  absReal (x)  | x >= 0    =  x
+               | otherwise =  - x;
+
+  signumReal (x) | x == 0    =  0
+                 | x > 0     =  1
+                 | otherwise = -1;
+
+
+  rangeSize               :: (a,a) -> Int where Ix (a);
+  rangeSize (l,u)         =  index ((l,u), u) + 1;
+
+  enumFromBy:: a -> a -> [a] where { Num (a) };
+  enumFromBy (n, k)       =  n :- enumFromBy ((n+k), k);
+
+  floatProperFraction:: a -> (b,a) where { RealFrac (a), Integers (b) };
+  floatProperFraction (x) =  if n >= 0
+                                then (m * b^n, 0)
+                                else (m1, k / c)
+                             where { (m,n)  = decodeFloat (x);
+                                     b      = floatRadix (x);
+                                     (m1,k) = divRem (m, e);
+                                     c      = b^(-n); } ;
+
+  floatApproxRational:: a -> a -> Rational where Real (a);
+  floatApproxRational (x, eps) =
+      case withinEps of {
+          r:-r1:-_ | denominator (r) == denominator (r1) -> r1;
+          r:-_                                          -> r;
+     
+  }     where {withinEps = dropWhile((\(r) -> abs (r - x) > eps)
+                                  (approximants (p, q)));
+            (p,q)     = if n < 0 then (m, b^(-n)) else (m*b^n, 1);
+            (m,n)     = decodeFloat (x);
+            b         = floatRadix (x); };
+
+  minInt, maxInt        :: Int;
+  minInt                =  primitive "minInt";
+  maxInt                =  primitive "maxInt";
+
+  fst                   :: (a,b) -> a;
+  fst ((x,y))           =  x;
+  
+  snd                   :: (a,b) -> b;
+  snd ((x,y))           =  y;
+  
+  until                       :: (a -> Bool) -> (a -> a) -> a -> a;
+  until (p, f, x) | p (x)     =  x
+                  | otherwise =  until (p, f, f (x));
+  equations:: definition -> [ String ] ;
+  equations = primitive "ExtractEquations";
+
+  full_name:: definition -> String;
+  full_name = primitive "FullName";
+
+  local_name:: definition -> String;
+  local_name = primitive "LocalName";
+
+  attribute_value:: anattribute (a) -> String -> a; 
+  attribute_value = primitive "AttributeValue";
+  attribute conn_number: Int;
+
+  connection_set :: connector -> [String];
+  connection_set = primitive "ConnectionSet";
+
+  connected_obj:: connector -> property a -> [(String,a)];
+  connected_obj = primitive "ConnectedObject";
+
+  structure_conn:: structure -> [String];
+  structure_conn = primitive "StructureConnectors";
+
+  structure_obj:: structure -> property a -> [(String, a)];
+  structure_obj = primitive "StructureObject";
+
+  sum_conn_objs:: connector -> property a -> a;
+  sum_conn_objs = primitive "SumConnectorObjects";
+  -- sum_conn_objs (x,at) = sum ([ a | (s,a) = connected_obj (x,at)]);
+
+  sum_str_objs:: structure -> property a -> a;
+  sum_str_objs = primitive "SumStructureObjects";
+  -- sum_str_objs (x,at) = sum ([ a | (s,a) = structure_obj (x,at)]);
+  parent_conn_set ::connector -> [String];
+  parent_conn_set = primitive "ParentConnectorSet";
+
+  parent_conn_obj:: connector -> property a -> [(String,a)];
+  parent_conn_obj = primitive "ParentConnectorObject";
+
+  parent_str_conn:: structure -> [String];
+  parent_str_conn = primitive "ParentStructureConnectors";
+
+  parent_str_obj:: structure -> property a -> [(String, a)];
+  parent_str_obj = primitive "ParentStructureObject";
+
+  sum_parcon_objs:: connector -> property a -> a;
+  sum_parcon_objs = primitive "SumParconObjects";
+  -- sum_parcon_objs (x,at) = sum ([ a | (s,a) = parent_conn_obj (x,at)]);
+
+  sum_parstr_objs:: structure -> property a -> a;
+  sum_parstr_objs = primitive "SumParstrObjects";
+  -- sum_parstr_objs (x,at) = sum ([ a | (s,a) = structure_obj (x,at)]);
+
+  child_conn_set :: connector -> [String];
+  child_conn_set = primitive "ChildConnectorSet";
+
+  child_con_obj:: connector -> property a -> [(String,a)];
+  child_con_obj = primitive "ChildConnectorObject";
+
+  child_str_conn:: structure -> [String];
+  child_str_conn = primitive "ChildStrructureConnectors";
+
+  child_str_obj:: structure -> property a -> [(String, a)];
+  child_str_obj = primitive "ChildStructureObject";
+
+  sum_chicon_objs:: connector -> property a -> a;
+  sum_chicon_objs = primitive "SumChiconObjects";
+  -- sum_chicon_objs (x,at) = sum ([ a | (s,a) = child_con_obj (x,at)]);
+
+  sum_chistr_objs:: structure -> property a -> a;
+  sum_chistr_objs = primitive "SumChistrObjects";
+  -- sum_chistr_objs (x,at) = sum ([ a | (s,a) = child_str_obj (x,at)]);
+  extract               :: String -> [(String,a)] -> a;
+  extract (s, [])       = error ("Error in Extract: String not found");
+  extract (s, (n,v):-xs) = if s==n then v else extract (s, xs);
+  isType:: a -> type -> Bool;
+  isType = primitive "IsType";
+  type wave_type where { Complex (wave_type), Real (wave_type) };
+  type connector_type = untyped | electric | sigflow | distrib;
+  attribute ctype: connector_type;
+  attribute voltage: Time -> potential;
+  attribute amperage:   Time -> current;
+
+  type Direction = indir | out | inout | nodir;
+  attribute dir: Direction;
+  class CalcFuncs (a) {
+    deriv:: (a -> b) -> a -> b where Fractional(b);
+    defint::(a,a) -> (a -> b) -> b where Fractional(b);
+    indefint:: (a -> b) -> ((a -> b), a) where Fractional(b);
+
+    defint ((b, e), f) = g(e) - g(b)
+                         where { (g,_) = indefint (f); } ;
+  } where Fractional (a);
+
+  instance CalcFuncs (Float) {
+    deriv = primitive "FloatDerivative";
+    defint = primitive "FloatDefiniteIntegral";
+    indefint = primitive "FloatIndefiniteIntegral"; } ;
+
+  instance CalcFuncs (Rectang(a)) {
+    deriv = primitive "RectangDerivative";
+    defint = primitive "RectangDefiniteIntegral";
+    indefint = primitive "RectangIndefiniteIntegral"; } ;
+
+  instance CalcFuncs (Polar(a)) {
+    deriv = primitive "PolarDerivative";
+    defint = primitive "PolarDefiniteIntegral";
+    indefint = primitive "PolarIndefiniteIntegral"; } ;
+
+  instance CalcFuncs (Extnum (a)) {
+    deriv = primitive "ExtnumDerivative";
+    defint = primitive "ExtnumDefiniteIntegral";
+    indefint = primitive "ExtnumIndefiniteIntegral"; } ;
+
+  instance CalcFuncs (Phys (a)) {
+    deriv = primitive "PhysicalDerivative";
+    defint = primitive "PhysicalDefiniteIntegral";
+    indefint = primitive "PhysicalIndefiniteIntegral"; } ;
+  impulse:: Funcsig;
+  impulse = primitive "ImpulseFunction";
+  rseed:: definition -> Float;
+  rseed = primitive "RandomSeed";
+
+  random:: Float -> Float;
+  random = primitive "RandomNumberGenerator";
+
+  norm:: Float -> Float -> Float -> Float;
+  norm (mu, sig, x) = exp ((- (x - mu)**2) / (2*sig**2));
+
+  log_norm:: Float -> Float -> Float -> Float;
+  log_norm (alpha, beta, x) = (alpha / (sqrt(2*pi))*x) * 
+                              exp(-0.5*(alpha * ln(x) + beta)**2);
+end Standard;

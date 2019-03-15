@@ -1,0 +1,51 @@
+.y.c:
+	$(YACC) $(YFLAGS) $*.y
+	mv y.tab.h $*.tab.h
+	sed 's/^static //' y.tab.c > $*.tab.c
+	
+CC=gcc
+CFLAGS=-g
+YACC=yacc
+YFLAGS=-dvt
+FILES=lex.c mhdl.c mhdl.h mhdl.y sym.c semantics.c stdarg.h gvarargs.h \
+	Makefile.sun Makefile.others \
+	units.mhdl standard.mhdl errors.awk tokens.awk mies.1 \
+	LICENSE COPYING README HISTORY
+
+mies: mhdl.o mhdl.tab.o lex.o sym.o semantics.o errors.o
+	$(CC) -o mies mhdl.o mhdl.tab.o lex.o sym.o semantics.o errors.o
+
+mhdl.tab.c: mhdl.y mhdl.debug
+	$(YACC) $(YFLAGS) mhdl.y
+	mv y.tab.h mhdl.tab.h
+	sed 's/^static //' y.tab.c > mhdl.tab.c
+
+mhdl.debug: mhdl.y
+	cp /dev/null mhdl.debug
+
+errors.c: y.output mhdl.tab.h
+	awk -f errors.awk y.output > errors.c
+	awk -f tokens.awk mhdl.tab.h >> errors.c
+
+mhdl.tab.o: mhdl.tab.c
+	$(CC) -c mhdl.tab.c
+
+lex.o: lex.c mhdl.tab.h
+	$(CC) -c -DBACKTRACE lex.c
+
+mhdl.o: mhdl.c mhdl.h
+
+sym.o: sym.c
+
+errors.o: errors.c
+
+semantics.o: semantics.c
+
+mhdl.tar: $(FILES)
+	tar cvf mhdl.tar $(FILES)
+
+mhdl.ar: $(FILES)
+	ar cvf mhdl.ar $(FILES)
+
+clean:
+	rm -rf *.o

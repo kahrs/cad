@@ -1,0 +1,59 @@
+ENTITY vco IS
+	GENERIC (
+		f0,
+		kf,
+		magmax,
+		phase,
+		holdrange,
+		tdelay,
+		trise,
+		maxderiv
+		: REAL);
+	PIN (inp, outp : ELECTRICAL);
+END ENTITY vco;
+
+ARCHITECTURE a1 of vco IS
+	STATE w, phi, dw, mag : ANALOG;
+BEGIN
+  RELATION
+     PROCEDURAL FOR INIT =>
+	f0 := 1.0e6;
+	kf := 1.0e6;
+	magmax := 1.0;
+	holdrange := 0.4e6;
+	tdelay := 2.0e-5;
+	trise := 3.0e-5;
+	maxderiv := 100.0;
+
+     PROCEDURAL FOR DC =>
+	outp.v %= 0.0;
+
+     PROCEDURAL FOR AC, TRANSIENT =>
+	IF (inp.v > holdrange / (2.0 * kf)) OR
+	   (inp.v < -holdrange / (2.0 * kf)) THEN
+		w := twopi * f0;
+	ELSE
+		w := twopi * (f0 * kf * inp.v);
+	END IF;
+
+	dw := (current_time - time_step) * (previous(w) - w);
+	phi := dw + previous(phi);
+
+	IF current_time > (tdelay+trise) THEN
+		mag := magmax;
+	ELSE
+		IF current_time < tdelay THEN
+			mag := 0.0;
+		ELSE
+			mag := magmax * (current_time - tdelay) / trise;
+		END IF;
+	END IF;
+
+	IF (ABS(dw) > maxderiv) THEN
+		outp.v %= mag * sin(twopi * f0 * current_time + phi +
+			(phase / REAL(360) * twopi));
+	ELSE
+		outp.v %= mag * sin(w * current_time + phi +
+			(phase / REAL(360) * twopi));
+	END;
+END;

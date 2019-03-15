@@ -1,0 +1,21 @@
+25 December 1993
+	This marks the zeroth release of the MHDL front-end.  It has a number
+	of bugs and does not implement a typed symbol table.  However, it
+	has been ported to three different operating systems (Sun, SGI
+	and Plan9) and compiles under gcc and lcc.  Operating system specific
+	code is hopefully very limited (see syntax error reporting).
+	There are two Makefiles, one for Sun and one for everyone else.
+	The compile time switch BACKTRACE permits a readable version of
+	the parse stack backtrace; this is not available in the non-Sun
+	system.
+
+	The release also includes units.mhdl, the units package from Compact
+	and Chapter 10 (standard.mhdl).  Both of these parse error free
+	in this release.
+
+	Please note that the front-end will change in subsequent releases
+	so changes to the semantics (in mhdl.y) should be done with care.
+
+61845 Jan  2 14:54
+	Fixes a grammar error and also improves the Makefiles to make them
+	easier to modify for different versions of yacc and OS.
