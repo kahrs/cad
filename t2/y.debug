@@ -1,0 +1,250 @@
+#ifdef YYDEBUG
+char *yytoknames[] = {
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0," &",
+0,0,0," *",
+" +",
+0," -",
+0," /",
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0," ^",
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0," |",
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"ID",
+"NUMBER",
+"UMINUS",
+"LT",
+"LE",
+"EQ",
+"GE",
+"GT",
+"NE",
+"EXP",
+"MATERIAL",
+"OBJECT",
+"GLOBAL",
+"PROPERTIES",
+"CYLINDER",
+"BLOCK",
+"SPHERE",
+"IN",
+"FT",
+"M",
+"CM",
+"MM",
+"DO",
+"IF",
+"FOR",
+"THEN",
+"ELSE",
+"AT",
+"SWITCH",
+"INTEGER",
+"FLOAT",
+"STRING",
+"CONSTANT",
+"LIST",
+"FUNCTION",
+"CALL",
+"TERMINAL",
+"PROPERTY",
+"COMPOUND",
+"TUPLE",
+"UNION",
+"INTERSECT",
+"ROTATE",
+"DIFFERENCE",
+"ASSEMBLY",
+"UPTO",
+"DOWNTO",
+"BIND",
+"ALTERNATIVE",
+"LABEL",
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,};
+char *yystates[] = {
+"$accept : .start $end \n", /*0*/
+"$accept :  start.$end \n", /*1*/
+"", /*2*/
+"", /*3*/
+"", /*4*/
+"", /*5*/
+"", /*6*/
+"", /*7*/
+"object :  OBJECT.variable params = objective \n", /*8*/
+"material :  MATERIAL.variable { properties } \n", /*9*/
+"global :  GLOBAL.{ glist } \n", /*10*/
+"", /*11*/
+"", /*12*/
+"", /*13*/
+"material :  MATERIAL variable.{ properties } \n", /*14*/
+"global :  GLOBAL {.glist } \n", /*15*/
+"object :  OBJECT variable params.= objective \n", /*16*/
+"params :  (.idlist ) \n", /*17*/
+"", /*18*/
+"material :  MATERIAL variable {.properties } \n", /*19*/
+"global :  GLOBAL { glist.} \nglist :  glist., gequals \n", /*20*/
+"", /*21*/
+"gequals :  variable.= constant \n", /*22*/
+"object :  OBJECT variable params =.objective \n", /*23*/
+"params :  ( idlist.) \n", /*24*/
+"", /*25*/
+"material :  MATERIAL variable { properties.} \nproperties :  properties.property \n", /*26*/
+"", /*27*/
+"property :  PROPERTIES.variable { plist } \n", /*28*/
+"", /*29*/
+"glist :  glist ,.gequals \n", /*30*/
+"gequals :  variable =.constant \n", /*31*/
+"", /*32*/
+"", /*33*/
+"", /*34*/
+"", /*35*/
+"", /*36*/
+"if :  IF.( conditional ) THEN objective ELSE objective \n", /*37*/
+"for :  FOR.variable IN range DO objective \n", /*38*/
+"switch :  SWITCH.( expression ) IN { alternatives } \n", /*39*/
+"", /*40*/
+"csg :  (.csg ) \n", /*41*/
+"", /*42*/
+"terminal :  CYLINDER.( double ) \n", /*43*/
+"terminal :  BLOCK.( triple ) \n", /*44*/
+"terminal :  SPHERE.( expression ) \n", /*45*/
+"", /*46*/
+"", /*47*/
+"idlist :  variable ,.idlist \n", /*48*/
+"", /*49*/
+"", /*50*/
+"property :  PROPERTIES variable.{ plist } \n", /*51*/
+"", /*52*/
+"", /*53*/
+"", /*54*/
+"", /*55*/
+"", /*56*/
+"csg :  csg |.csg \n", /*57*/
+"csg :  csg &.csg \n", /*58*/
+"csg :  csg -.csg \n", /*59*/
+"csg :  csg +.csg \n", /*60*/
+"csg :  csg *.[ triple ] \n", /*61*/
+"if :  IF (.conditional ) THEN objective ELSE objective \n", /*62*/
+"for :  FOR variable.IN range DO objective \n", /*63*/
+"switch :  SWITCH (.expression ) IN { alternatives } \n", /*64*/
+"csg :  csg.| csg \ncsg :  csg.& csg \ncsg :  csg.- csg \ncsg :  csg.+ csg \ncsg :  csg.* [ triple ] \ncsg :  ( csg.) \n", /*65*/
+"", /*66*/
+"postpositions :  :.property_list \n", /*67*/
+"", /*68*/
+"terminal :  CYLINDER (.double ) \n", /*69*/
+"terminal :  BLOCK (.triple ) \n", /*70*/
+"terminal :  SPHERE (.expression ) \n", /*71*/
+"", /*72*/
+"optionalList :  (.list ) \n", /*73*/
+"", /*74*/
+"", /*75*/
+"property :  PROPERTIES variable {.plist } \n", /*76*/
+"", /*77*/
+"", /*78*/
+"", /*79*/
+"", /*80*/
+"csg :  csg * [.triple ] \n", /*81*/
+"if :  IF ( conditional.) THEN objective ELSE objective \n", /*82*/
+"expression :  expression.+ expression \nexpression :  expression.- expression \nexpression :  expression.* expression \nexpression :  expression./ expression \nexpression :  expression.EXP expression \nconditional :  expression.LE expression \nconditional :  expression.LT expression \nconditional :  expression.EQ expression \nconditional :  expression.GE expression \nconditional :  expression.GT expression \nconditional :  expression.NE expression \n", /*83*/
+"expression :  -.expression \n", /*84*/
+"", /*85*/
+"", /*86*/
+"for :  FOR variable IN.range DO objective \n", /*87*/
+"switch :  SWITCH ( expression.) IN { alternatives } \nexpression :  expression.+ expression \nexpression :  expression.- expression \nexpression :  expression.* expression \nexpression :  expression./ expression \nexpression :  expression.EXP expression \n", /*88*/
+"", /*89*/
+"", /*90*/
+"location :  AT.[ triple ] \n", /*91*/
+"", /*92*/
+"", /*93*/
+"", /*94*/
+"terminal :  CYLINDER ( double.) \n", /*95*/
+"double :  expression., expression \nexpression :  expression.+ expression \nexpression :  expression.- expression \nexpression :  expression.* expression \nexpression :  expression./ expression \nexpression :  expression.EXP expression \n", /*96*/
+"terminal :  BLOCK ( triple.) \n", /*97*/
+"triple :  expression., expression , expression \nexpression :  expression.+ expression \nexpression :  expression.- expression \nexpression :  expression.* expression \nexpression :  expression./ expression \nexpression :  expression.EXP expression \n", /*98*/
+"terminal :  SPHERE ( expression.) \nexpression :  expression.+ expression \nexpression :  expression.- expression \nexpression :  expression.* expression \nexpression :  expression./ expression \nexpression :  expression.EXP expression \n", /*99*/
+"optionalList :  ( list.) \n", /*100*/
+"", /*101*/
+"property :  PROPERTIES variable { plist.} \nplist :  plist., pequals \n", /*102*/
+"", /*103*/
+"pequals :  variable.= constant \n", /*104*/
+"csg :  csg * [ triple.] \n", /*105*/
+"if :  IF ( conditional ).THEN objective ELSE objective \n", /*106*/
+"expression :  expression +.expression \n", /*107*/
+"expression :  expression -.expression \n", /*108*/
+"expression :  expression *.expression \n", /*109*/
+"expression :  expression /.expression \n", /*110*/
+"expression :  expression EXP.expression \n", /*111*/
+"conditional :  expression LE.expression \n", /*112*/
+"conditional :  expression LT.expression \n", /*113*/
+"conditional :  expression EQ.expression \n", /*114*/
+"conditional :  expression GE.expression \n", /*115*/
+"conditional :  expression GT.expression \n", /*116*/
+"conditional :  expression NE.expression \n", /*117*/
+"", /*118*/
+"expression :  variable (.list ) \n", /*119*/
+"", /*120*/
+"", /*121*/
+"", /*122*/
+"", /*123*/
+"", /*124*/
+"", /*125*/
+"", /*126*/
+"", /*127*/
+"for :  FOR variable IN range.DO objective \n", /*128*/
+"range :  expression.UPTO expression \nrange :  expression.DOWNTO expression \nexpression :  expression.+ expression \nexpression :  expression.- expression \nexpression :  expression.* expression \nexpression :  expression./ expression \nexpression :  expression.EXP expression \n", /*129*/
+"switch :  SWITCH ( expression ).IN { alternatives } \n", /*130*/
+"location :  AT [.triple ] \n", /*131*/
+"", /*132*/
+"", /*133*/
+"double :  expression ,.expression \n", /*134*/
+"", /*135*/
+"triple :  expression ,.expression , expression \n", /*136*/
+"", /*137*/
+"", /*138*/
+"list :  expression ,.list \n", /*139*/
+"", /*140*/
+"plist :  plist ,.pequals \n", /*141*/
+"pequals :  variable =.constant \n", /*142*/
+"", /*143*/
+"if :  IF ( conditional ) THEN.objective ELSE objective \n", /*144*/
+"", /*145*/
+"", /*146*/
+"", /*147*/
+"", /*148*/
+"", /*149*/
+"", /*150*/
+"", /*151*/
+"", /*152*/
+"", /*153*/
+"", /*154*/
+"", /*155*/
+"expression :  variable ( list.) \n", /*156*/
+"for :  FOR variable IN range DO.objective \n", /*157*/
+"range :  expression UPTO.expression \n", /*158*/
+"range :  expression DOWNTO.expression \n", /*159*/
+"switch :  SWITCH ( expression ) IN.{ alternatives } \n", /*160*/
+"location :  AT [ triple.] \n", /*161*/
+"", /*162*/
+"triple :  expression , expression., expression \nexpression :  expression.+ expression \nexpression :  expression.- expression \nexpression :  expression.* expression \nexpression :  expression./ expression \nexpression :  expression.EXP expression \n", /*163*/
+"", /*164*/
+"", /*165*/
+"", /*166*/
+"if :  IF ( conditional ) THEN objective.ELSE objective \n", /*167*/
+"", /*168*/
+"", /*169*/
+"", /*170*/
+"", /*171*/
+"switch :  SWITCH ( expression ) IN {.alternatives } \n", /*172*/
+"", /*173*/
+"triple :  expression , expression ,.expression \n", /*174*/
+"if :  IF ( conditional ) THEN objective ELSE.objective \n", /*175*/
+"switch :  SWITCH ( expression ) IN { alternatives.} \nalternatives :  alternatives., label \n", /*176*/
+"", /*177*/
+"label :  constant.: csg \nlabel :  constant.: constant \n", /*178*/
+"", /*179*/
+"", /*180*/
+"", /*181*/
+"alternatives :  alternatives ,.label \n", /*182*/
+"label :  constant :.csg \nlabel :  constant :.constant \n", /*183*/
+"", /*184*/
+"", /*185*/
+"", /*186*/
+};
+#endif

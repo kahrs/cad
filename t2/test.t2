@@ -1,0 +1,35 @@
+-- this is a test for t2
+
+global {
+	title = "test t2 file",
+	comment = "when will it work?"
+}
+
+material ceramic {
+	properties radiation {
+		transmissivity = 0.2,
+		absorptivity = 0.8
+	}
+	properties heat_capacity {
+		absorptivity = 0.1
+	}
+}
+
+object cup = cylinder ( 2.1 in, 3.1 in) - cylinder( 2 in, 3 in)
+
+object leg = block(1 in, 1 in, 29 in)
+
+object desk(l, w, h) = block(l, w, 2 in) +
+	leg at [0 in, 0 in, 2 in] +	
+	leg at [w, 0 in, 2 in] +	
+	leg at [0 in, w, 2 in] +	
+	leg at [w, w, 2 in]	
+
+object coffee_break(x) =
+	desk(60 in, 36 in, 29 in) at [x, 1 ft, 0 ft] +
+	cup : ceramic at [x+1 ft, 2 ft, 29 in]
+
+object main =
+	coffee_break(0 ft) +
+	coffee_break(10 ft)
+

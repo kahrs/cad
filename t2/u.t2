@@ -1,0 +1,7 @@
+global {
+	units = "mm"
+}
+object leg = block(1 in, 1 in, 29 in) at [0 cm, 1 m, 2 ft] * [30,60,90]
+
+object main = leg
+

@@ -1,0 +1,6 @@
+-- csg postorder test
+
+object test = ((sphere(0 in) - (sphere(1 in) | sphere(2 in))) + (sphere(3 in) & sphere(4 in)))
+
+object main = test
+

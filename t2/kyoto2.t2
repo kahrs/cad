@@ -1,0 +1,48 @@
+/*
+ * Kyoto Meeting room
+ */
+
+global {
+	title = "Kyoto Meeting room",
+	comment = "when will it work?"
+}
+
+material wallboard {
+	properties radiation {
+		reflectivity = 0.1,
+		transmissivity = 0.2,
+		absorptivity = 0.7
+	}
+}
+
+material floor {
+	properties radiation {
+		reflectivity = 0.8,
+		transmissivity = 0.1,
+		absorptivity = 0.1
+	}
+}
+
+material concrete {
+	properties radiation {
+		reflectivity = 0.8,
+		transmissivity = 0.1,
+		absorptivity = 0.1
+	}
+}
+
+object main =
+	wall(18.3 m, 3 m) : wallboard at [0 m, 0 m, 0 m] +
+	wall(18.3 m, 3 m) : wallboard at [0 m, 7.7 m, 0 m] +
+	(wall(7.7 m, 3 m) : wallboard at [0 m, 0 m, 0 m]) * [0, 0, +270] +
+	(wall(7.7 m, 3 m) : wallboard at [18.3 m, 0 m, 0 m]) * [0, 0, +270] +
+	pillar(3 m) : concrete at [18.3 m / 2, 0 m, 0 m] +
+	pillar(3 m) : concrete at [18.3 m * (1 / 4), 7.7 m, 0 m] +
+	pillar(3 m) : concrete at [18.3 m * (2 / 4), 7.7 m, 0 m] +
+	pillar(3 m) : concrete at [18.3 m * (3 / 4), 7.7 m, 0 m] +
+	block(18.3 m, 7.7m, 0.5 m) : floor +
+	block(18.3 m, 7.7m, 0.5 m) : floor at [0 m, 0 m, 3 m] /* ceiling */
+
+object pillar(ht) = block(0.5 m, 0.5 m, ht)
+
+object wall(len, ht) = block(len, 0.5 m, ht)

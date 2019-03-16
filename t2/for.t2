@@ -1,0 +1,13 @@
+
+object cup(x) =
+	if (x == 1) then
+		cylinder ( 2.1 in, 3.1 in) - cylinder( 2 in, 3 in)
+	else
+		switch (x) in
+			{ 2: cylinder ( 5.0 in, 2.0 in),
+			  3: box (5.0 in, 1.2 in)
+			}
+
+object main =
+	for i in 1 ft upto 5 ft do
+		cup at [i, 2 ft, 29 in]

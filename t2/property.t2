@@ -1,0 +1,14 @@
+material ceramic {
+	properties radiation {
+		transmissivity = 0.2,
+		absorptivity = 0.8
+	}
+	properties heat_capacity {
+		absorptivity = 0.1
+	}
+}
+
+object cup = cylinder ( 2.1 in, 3.1 in) - cylinder( 2 in, 3 in)
+
+object main =
+	cup : ceramic at [0 ft, 2 ft, 29 in]

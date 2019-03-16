@@ -1,0 +1,7 @@
+/*
+ * test for t2
+ */
+
+object main = (sphere(0 in) - (sphere(1 in) + sphere(2 in))) |
+		(sphere(3 in) & sphere(4 in) * [30,60,90])
+
