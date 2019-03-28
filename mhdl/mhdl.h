@@ -455,7 +455,7 @@ void verify_name_type(Node *node, unsigned int category);
 Symbol *declare_name(Symbol *name, int category);
 Symbol *push_name(Symbol *s);
 void cmp_name(Symbol *a, Symbol *b);
-void full_cmp_name(Symbol *a, Symbol *b);
+void full_cmp_name(Node *a, Node *b);
 Symbol *pop_name(void);
 Bucket *lookup_name(Bucket **hashtable, char *name);
 Symbol *define_name(Bucket *b, int category);
@@ -474,6 +474,7 @@ void check_multiplier(char *name);
 void print_undefs(Symbol *top);
 void rwinit(void);
 Symbol *dereference_node(Node *node);
+Node *new_variable(Bucket *name);
 
 char debug[256];
 extern char *cmdname;
@@ -550,4 +551,4 @@ TypeScheme *new_type_scheme(Type *t, TypeList *vl);
 char *argv0;
 #endif
 
-#define YYSTYPE yystype
+

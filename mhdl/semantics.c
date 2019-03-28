@@ -4,6 +4,7 @@
 #include <libc.h>
 #else
 #include <string.h>
+#include <stdlib.h>
 #endif
 #include "mhdl.h"
 #include "mhdl.tab.h"
@@ -97,7 +98,7 @@ new_node(int operator, Node *left, Node *right)
 void
 print_node(Node *node)
 {
-	fprintf(stderr, "node %x: ", node);
+	fprintf(stderr, "node %p: ", node);
 	switch (node -> operator) {
 case O_INT:
 	fprintf(stderr, "INT: %ld", node -> u.iconstant);
@@ -117,12 +118,12 @@ case O_OP:
 	else	fprintf(stderr, "OP: %s", node -> bucket -> name);
 	break;
 case O_PAIR:
-	fprintf(stderr, "%s: tree.left %x, tree.right %x", op_names[node -> operator],
+	fprintf(stderr, "%s: tree.left %p, tree.right %p", op_names[node -> operator],
 	node -> u.tree.left, node -> u.tree.right);
 	break;
 case O_NULL:
 default:
-	fprintf(stderr, "%s: tree.left %x, tree.right %x", op_names[node -> operator],
+	fprintf(stderr, "%s: tree.left %p, tree.right %p", op_names[node -> operator],
 	node -> u.tree.left, node -> u.tree.right);
 	if (node -> symbol)
 		fprintf(stderr, " [%s]", node -> symbol -> bucket -> name);
@@ -205,8 +206,10 @@ new_cell(Symbol *s)
 	new -> linenumber = line_number;
 	new -> filename = filename;
 	if (s)
-		if (s -> cell) fprintf(stderr, "%s of type %d already used in new_cell?\n", s -> bucket -> name, s -> type);
-		else s -> cell = new;
+		if (s -> cell)
+		    fprintf(stderr, "%s of type %p already used in new_cell?\n", s -> bucket -> name, s -> type);
+		else
+		    s -> cell = new;
 	return(new);
 } /* end new_cell */
 
@@ -285,6 +288,11 @@ new_instance(Symbol *sym, Node *spec, Node *body, Node *context)
 	cell -> cell.instance =  instance;
 	return(cell);
 } /* end new_instance */
+
+Node *
+new_variable(Bucket *name)
+{
+} /* end new_variable */
 
 Node *
 new_label(Symbol *sym, Node *def)
@@ -535,7 +543,7 @@ analyze_name(Node *root)
 	case ABS_PROP_NAME:
 	default:
 		print_node(root);
-		fprintf(stderr, "symbol %s type %x\n", s->bucket->name, s->type);
+		fprintf(stderr, "symbol %s type %p\n", s->bucket->name, s->type);
 		fatal("unknown type in analyze_name");
 	} /* end switch */
 } /* end analyze_name */
@@ -667,7 +675,7 @@ print_class(Symbol *s)
 {
 	Class *class;
 	class = s -> cell -> cell.class;
-fprintf(stderr, "s->cell=%x\n", s->cell);
+fprintf(stderr, "s->cell=%p\n", s->cell);
 if (class == Nil(Class)) fprintf(stderr, "class dismissed.\n");
 	fprintf(stderr, "arity: %d\n", class -> arity);
 	print_tree(class -> header);

@@ -1,20 +1,14 @@
-#include <stdio.h>
 #ifdef PLAN9
 #include <u.h>
 #include <libc.h>
 #else
-#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #endif
-
-#ifndef PLAN9
-#ifdef __GNUC__
-#include "gvarargs.h"
-#else
-#include "stdarg.h"
-#endif
-#endif
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
 
 #include "mhdl.h"
 
@@ -67,7 +61,7 @@ main(int argc, char *argv[])
 		break;
 	} ARGEND
 	if(argc < 1) {
-		fprintf(stderr, "usage: %s [-options] files\n", cmdname, c);
+		fprintf(stderr, "usage: %s [-options] files\n", cmdname);
 		exits("usage");
 	}
 	rwinit();
@@ -76,7 +70,7 @@ main(int argc, char *argv[])
 	type_init();
 	for (c=0; c<argc; c++)
 		new_file(*argv++);
-	if (debug['n']) fprintf(stderr, "%d nodes.\n", node_number);
+	if (debug['n']) fprintf(stderr, "%ld nodes.\n", node_number);
 } /* end main */
 
 void
@@ -159,22 +153,16 @@ fatal(char *msg)
 void
 warn(char *first, ...)
 {
-#ifndef __GNUC__
+#ifdef __GNUC__
         va_list argp;
 #else
 	char *argp;
 #endif
         char *argument;
-#ifndef __GNUC__
+        fprintf(stderr, "%s: file %s, line %ld: ", cmdname, filename, line_number);
         va_start(argp, first);
-#else
-        va_start(argp);
-#endif
-        fprintf(stderr, "%s: file %s, line %d: ", cmdname, filename, line_number);
-        for (argument = first;
-                argument != (char *) 0;
-                argument = va_arg(argp, char *))
-                fprintf(stderr, "%s ", argument);
+        for (argument = first; (argument != (char *) 0) && ((long int) argument != -1);argument = va_arg(argp, char *))
+                    fprintf(stderr, "%s ", argument);
         va_end(argp);
         fprintf(stderr, "\n");
         fflush(stderr);
@@ -183,22 +171,18 @@ warn(char *first, ...)
 void
 semantics(Node *node, char *first, ...)
 {
-#ifndef __GNUC__
+#ifdef __GNUC__
         va_list argp;
 #else
 	char *argp;
 #endif
         char *argument;
-#ifndef __GNUC__
         va_start(argp, first);
-#else
-        va_start(argp);
-#endif
         fprintf(stderr, "%s: file %s, line %d: ", cmdname, filename, node -> line);
         for (argument = first;
                 argument != (char *) 0;
                 argument = va_arg(argp, char *))
-                fprintf(stderr, "%s ", argument);
+                	fprintf(stderr, "%s ", argument);
         va_end(argp);
         fprintf(stderr, "\n");
         fflush(stderr);

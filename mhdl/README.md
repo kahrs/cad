@@ -19,6 +19,4 @@ to Makefile and type `make'.  It should run through yacc and the c compiler
 without unreasonable errors.  If you want to change the source of yacc or
 the c compiler, just change the appropriate variable in the Makefile.
 
-Under no circumstances should this program `dump core'; if it does, please
-send the offending line or model to the author.
 

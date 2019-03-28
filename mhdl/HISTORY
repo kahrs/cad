@@ -16,6 +16,23 @@
 	Please note that the front-end will change in subsequent releases
 	so changes to the semantics (in mhdl.y) should be done with care.
 
-61845 Jan  2 14:54
+Jan  2 14:54
 	Fixes a grammar error and also improves the Makefiles to make them
 	easier to modify for different versions of yacc and OS.
+
+Mar 27 EDT 2019
+	26 years later, I am releasing this.  I made it compile with
+	more modern C and YACC/Bison but that is the extent of my
+	work.  It runs, but there appear to be bugs in the semantics
+	routines.  If you'd like more, then please contact me.
+
+
+A
+A
+A
+A
+A
+A
+A
+A
+

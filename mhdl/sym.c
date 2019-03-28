@@ -8,6 +8,8 @@
 #include <sys/types.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <stdlib.h>
+#include <math.h>
 #endif
 
 #include "mhdl.h"
@@ -305,7 +307,7 @@ define_name(Bucket *bucket, int category)
 		if (!(s -> invisible)) {
 		    if (s -> category != 0 && s -> category != category)
 			warn(s->bucket->name, "was category", type_names[s->category], "now category", type_names[category], 0);
-		    if (debug['d']) fprintf(stderr, "%x old\n", new);
+		    if (debug['d']) fprintf(stderr, "%p old\n", new);
 		    return(s);
 		} /* end if visible */
 	new = new_symbol(bucket);
@@ -314,7 +316,7 @@ define_name(Bucket *bucket, int category)
 	new -> category = category;
 	bucket -> symbols = new;
 	fixup_undefines(name_stack_ptr, new);
-	if (debug['d']) fprintf(stderr, "%x new symbol %x bucket\n", new, bucket);
+	if (debug['d']) fprintf(stderr, "%p new symbol %p bucket\n", new, bucket);
 	return(new);
 } /* end define_name */
 
@@ -358,18 +360,18 @@ use_name(Node *node)
 		fatal("unknown op in use_name");
 	} /* end else */
 	if (debug['d'])
-		fprintf(stderr, "use name %s = %x ", bucket -> name, bucket);
+		fprintf(stderr, "use name %s = %p ", bucket -> name, bucket);
 	if (bucket -> token && !node -> code) {
 		warn("attempt to use reserved word", bucket -> name, 0);
 		return(Nil(Symbol));
 	} /* end if */
 	if (node -> operator == O_NAME) {
-		if (debug['d']) fprintf(stderr, "easy %x\n", node -> symbol);
+		if (debug['d']) fprintf(stderr, "easy %p\n", node -> symbol);
 		return(node -> symbol);
 	} /* end if */
 	for (s = bucket -> symbols; s; s = s->back)
 		if (!(s -> invisible)) {
-			if (debug['d']) fprintf(stderr, "found %x\n", s);
+			if (debug['d']) fprintf(stderr, "found %p\n", s);
 			return(s);
 		} /* end if */
 	/* not visible at current level so must be undef */
@@ -379,7 +381,7 @@ use_name(Node *node)
 	new -> type = T_NO;
 	bucket -> symbols = new;
 	if (debug['d'])
-		fprintf(stderr, "new symbol = %x\n", new);
+		fprintf(stderr, "new symbol = %p\n", new);
 	return(new);
 } /* end use_name */
 
@@ -458,14 +460,14 @@ cmp_name(Symbol *a, Symbol *b)
 } /* end cmp_name */
 
 void
-full_cmp_name(Symbol *a, Symbol *b)
+full_cmp_name(Node *a, Node *b)
 {
-	if (b == (Symbol *) 0) return;
+	if (b == (Node *) 0) return;
 	if (a != b) {
-		fprintf(stderr, "mhdl: line %d: ", line_number);
-		print_name(a);
+		fprintf(stderr, "mhdl: line %ld: ", line_number);
+		print_name(a -> symbol);
 		fprintf(stderr, " doesn't match ");
-		print_name(b);
+		print_name(b -> symbol);
 		fprintf(stderr, "\n");
 	} /* end if */
 } /* end full_cmp_name */
@@ -561,7 +563,7 @@ declare_variations(Node *head, Bucket *original)
 	Symbol *alias;
 	Bucket *ordinary;
 	if (head == Nil(Node)) return;
-	if (head -> operator == O_CONS) {
+	if (head -> operator == O_PAIR) {
 		declare_variations(head -> u.tree.left, original);
 		declare_variations(head -> u.tree.right, original);
 	}

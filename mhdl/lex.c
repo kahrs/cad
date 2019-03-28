@@ -4,6 +4,9 @@
 
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
 #ifdef PLAN9
 #include <u.h>
 #include <libc.h>
@@ -41,6 +44,7 @@ int issacred(char c);
 long escapedchar(char c);
 long numeric(char c);
 void eatstring(void);
+void lexerror(char *first, char *second);
 
 void
 initialize_lexer(FILE *f)     /* Change input file from STDIN to MHDL file */
@@ -59,9 +63,9 @@ yywrap(void)
 }
 
 void
-yyerror(char *msg, char *arg)
+yyerror(char *msg)
 {
-	warn(msg, arg, 0);
+	warn(msg, 0);
 #ifndef PLAN9
 #ifdef BACKTRACE
 	while (yyps >= yys)
@@ -143,7 +147,7 @@ top:	c = yygetc();
 				peekc = IGNORE;
 				peekc = yygetc();
 				if (peekc != '\'')
-					yyerror("missing closing ''", "");
+					lexerror("missing closing ''", "");
 				else peekc = IGNORE;
 			} /* end if '' */
 		} /* end '' */
@@ -235,7 +239,7 @@ numeric(char first)
 	for(;;) {
 		c = yygetc();
 		if(c == EOF) {
-			yyerror("EOF in numeric", "");
+			lexerror("EOF in numeric", "");
 			return(L_INTEGER);
 		} /* end EOF */
 		if(c == '\n')
@@ -304,7 +308,7 @@ numeric(char first)
 				state = ExpSign;
 			} /* end if # */
 			else {
-				yyerror("missing trailing # in fractional constant", "");
+				lexerror("missing trailing # in fractional constant", "");
 				goto done;
 			} /* end else */
 			break;
@@ -377,7 +381,7 @@ eatstring(void)
 		switch(c) {
 		case EOF:
 			buffer[count++] = '\0';
-			yyerror("EOF in string constant:", buffer);
+			lexerror("EOF in string constant:", buffer);
 			break;
 		case '\n':
 			line_number++;
@@ -386,7 +390,7 @@ eatstring(void)
 					c = yygetc();
 					if (c == EOF) {
 						buffer[count++] = '\0';
-						yyerror("EOF in gapped string constant", buffer);
+						lexerror("EOF in gapped string constant", buffer);
 						return;
 					} /* end if EOF */
 					if (c == '\\') break;
@@ -395,7 +399,7 @@ eatstring(void)
 				continue; /* to the top of the scanner */
 			} /* end gap */
 			else
-				yyerror("newline in string constant:", buffer);
+				lexerror("newline in string constant:", buffer);
 			goto done;
 		case '\\':
 			if (escaped) {
@@ -420,7 +424,7 @@ eatstring(void)
 	} /* end for */
 	while ((c = yygetc()) != '"');
 	buffer[count++] = '\0';
-	yyerror("string constant too long:", buffer);
+	lexerror("string constant too long:", buffer);
 	return;
 done:
 	buffer[count++] = '\0';
@@ -441,7 +445,7 @@ escapedchar(char c)
 		for(;;) {
 			c = yygetc();
 			if(c == EOF)
-				yyerror("EOF in escape sequence", "");
+				lexerror("EOF in escape sequence", "");
 			if(strchr("0123456789xX", c) == 0) {
 				peekc = c;
 				break;
@@ -487,7 +491,7 @@ escapedchar(char c)
 		break;
 	default:
 		fprintf(stdout, "Seen unknown escape \\%c\n", c);
-		yyerror("unknown \\ escape", "");
+		lexerror("unknown \\ escape", "");
 	} /* end case */
 	return(c);
 } /* end escapedchar */
@@ -511,3 +515,11 @@ issacred(char c)
 		return(0);
 	} /* end switch */
 }
+
+void
+lexerror(char *first, char *second)
+{
+	warn(first, 0);
+	warn(second, 0);
+}
+

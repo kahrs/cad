@@ -7,8 +7,8 @@ FILES=lex.c mies.c mhdl.h mhdl.y sym.c semantics.c types.c stdarg.h \
 	units.mhdl standard.mhdl errors.awk tokens.awk mhdl.1 \
 	LICENSE COPYING README HISTORY
 
-mies: mies.o mhdl.tab.o lex.o sym.o errors.o semantics.o types.o
-	$(CC) -o mies mies.o mhdl.tab.o lex.o sym.o errors.o semantics.o types.o -lm
+mies: mies.o mhdl.tab.o lex.o sym.o semantics.o types.o
+	$(CC) -o mies mies.o mhdl.tab.o lex.o sym.o semantics.o types.o -lm
 
 
 mhdl.debug: mhdl.y

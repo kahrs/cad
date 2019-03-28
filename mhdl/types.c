@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #ifdef PLAN9
 #include <u.h>
 #include <libc.h>
@@ -296,6 +297,7 @@ print_type_schemes(TypeList *list)
 		print_type_scheme(s -> head.scheme);
 } /* end print_type_schemes */
 
+int
 min_depth(Type *var)
 {
 	switch (var -> family) {
@@ -635,7 +637,7 @@ void
 instantiate_op(Instance *instance, int depth)
 {
 	while (instance) {
-fprintf(stderr, "instantiate %x\n", instance);
+fprintf(stderr, "instantiate %p\n", instance);
 		instance = instance -> chain;
 	} /* end while */
 } /* end instantiate_op */
@@ -710,7 +712,7 @@ type_check(Node *root, int depth)
 	left = Left(root);
 	right = Right(root);
 	if (debug['T'])
-		fprintf(stderr, "%d %x %s\n", depth, root, op_names[root -> operator]);
+		fprintf(stderr, "%d %p %s\n", depth, root, op_names[root -> operator]);
 	switch (root -> operator) {
 	case O_NAME:
 		if (root -> symbol -> type)
