@@ -3,8 +3,9 @@
  */
 
 #include <stdio.h>
-#include "stdarg.h"
 #include <string.h>
+#include <stdlib.h>
+#include <stdarg.h>
 #include <math.h>
 #include "t2.h"
 #include "iges.h"
@@ -45,6 +46,9 @@ void DontCare(char line[]);
 void EmitLine(char *string, char section, int de);
 
 char *strdup();
+void Bug();
+void Trouble();
+void StackTrace();
 
 void EmitIGES(struct ENTITY *top)
 {
@@ -78,11 +82,11 @@ void EmitGlobals()
 		AddToForm(line, "1H;"); continue;
 	case 3: case 15: case 21: case 22:
 		if (globalConstants[i]) {
-		    sprintf(format, "%dH%s", strlen(globalConstants[i]), globalConstants[i]);
+		    sprintf(format, "%ldH%s", strlen(globalConstants[i]), globalConstants[i]);
 		    AddToForm(line, format);
 		} /* end if */
 		continue;
-	case 4:	sprintf(format, "%dH%s", strlen(fileName), fileName);
+	case 4:	sprintf(format, "%ldH%s", strlen(fileName), fileName);
 		AddToForm(line, format); continue;
 	case 5:	AddToForm(line, "2Ht2"); continue;
 	case 6: AddToForm(line, "1H0"); continue;

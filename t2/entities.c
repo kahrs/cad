@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "stdarg.h"
+#include <stdlib.h>
 #include "y.tab.h"
 #include "t2.h"
 #include "iges.h"
@@ -16,6 +16,10 @@ struct BUCKET *Lookup(char *name, struct BUCKET *hashTable[], int size);
 
 float CheckFloatUnits();
 float CheckFloat();
+
+void Bug();
+void Trouble();
+void PrintParcel();
 
 struct PARCEL *NewEntityParcel(struct ENTITY *entity)
 {

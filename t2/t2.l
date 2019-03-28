@@ -1,11 +1,9 @@
 %{
 
-#undef input
-#undef output
-#undef unput
-
+#define YYSTYPE int
 #include "y.tab.h"
 
+int
 yywrap()
 { return(1); }
 
@@ -20,6 +18,7 @@ exponent	[eE][+-]?[0-9]("_"?[0-9])*
 dot		\.
 slash		"/"
 separators	[ \t\n\f]
+
 
 %%
 
@@ -94,7 +93,7 @@ separators	[ \t\n\f]
 "downto" return(DOWNTO);
 
 [A-Za-z][_$A-Za-z0-9]* { return(ID); }
-{integer}({dot}{integer})?({exponent})? { return(FLOAT); }
+{integer}{dot}({integer})?({exponent})? { return(FLOAT); }
 {integer}	return(INTEGER);
 \".*\"	return(STRING);
 

@@ -5,36 +5,42 @@
 %{
 
 #include "t2.h"
+#include <string.h>
 
-extern struct NODE *NullaryNode();
-extern struct NODE *StringNode();
-extern struct NODE *UnaryNode();
-extern struct NODE *BinaryNode();
-extern struct NODE *DeclarePlan();
-extern char *CopyString();
+void yyerror(char *);
+int yylex(void);
 
-extern struct PROPERTY_VALUE *PatchManifests();
-extern struct PROPERTY_VALUE *DeclareManifest();
-extern struct MATERIAL_VALUES *DeclareProperty();
-extern struct MATERIAL_VALUES *PatchProperties();
+struct NODE *NullaryNode();
+struct NODE *StringNode();
+struct NODE *UnaryNode();
+struct NODE *BinaryNode();
+struct NODE *DeclarePlan();
+struct NODE *DeclareGlobal();
+struct NODE *DeclareMaterial();
+struct NODE *DeclareObject();
+char *CopyString();
 
-extern struct NODE *treeRoot;
-extern struct NODE *materialName, *propertyName;
+struct PROPERTY_VALUE *PatchManifests();
+struct PROPERTY_VALUE *DeclareManifest();
+struct MATERIAL_VALUES *DeclareProperty();
+struct MATERIAL_VALUES *PatchProperties();
 
-typedef union {
-	struct NODE *node;
-	struct PROPERTY_VALUE *property;
-	struct MATERIAL_VALUES *material;
-} YYSTYPE;
+struct NODE *treeRoot;
+struct NODE *materialName, *propertyName;
 
-extern int integerConstant;
-extern float floatingConstant;
-extern char stringBuffer[128];
-extern char yytext[];
+char *yytext;
 
 char *quoted;
 
 %}
+%union {
+	struct NODE *node;
+	struct PROPERTY_VALUE *property;
+	struct MATERIAL_VALUES *material;
+	int integerConstant;
+	float floatingConstant;
+	char stringBuffer[128];
+}
 
 %token ID NUMBER
 %token UMINUS LT LE EQ GE GT NE EXP
@@ -44,7 +50,7 @@ char *quoted;
 %token DO IF FOR THEN ELSE AT SWITCH
 %token INTEGER FLOAT STRING
 
-%token CONSTANT LIST FUNCTION CALL TERMINAL PROPERTY COMPOUND TUPLE
+%token CONSTANT LIST FUNCTION CALL TERMINAL PROPERTY COMPOUND 
 %token UNION INTERSECT ROTATE DIFFERENCE ASSEMBLY TUPLE UPTO DOWNTO BIND
 %token ALTERNATIVE LABEL /* not used by parser */
 
@@ -57,7 +63,7 @@ char *quoted;
 %nonassoc LT LE EQ GE GT NE
 
 %type <node> plan stmnt declaration material property_list alternatives
-%type <node> object params idlist plan csg primitive for range switch label
+%type <node> object params idlist csg primitive for range switch label
 %type <node> optionalList list location double triple units expression
 %type <node> conditional constant variable objective if terminal postpositions
 %type <node> STRING ID

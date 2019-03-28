@@ -4,8 +4,12 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
 #include "t2.h"
 #include "iges.h"
+
+#define YYSTYPE int
 #include "y.tab.h"
 
 #define PARCELSTACKLIMIT 100
@@ -33,6 +37,11 @@ void StackTrace(void);
 float ChangeUnits(struct PARCEL *theParcel);
 void PushCall(void);
 void PopCall(void);
+
+void Bug();
+void Trouble();
+
+void EmitDE();
 
 char *strdup();
 
@@ -153,7 +162,7 @@ StringNode(int operator, char *string)
 	node -> left = node -> right = Null_struct(NODE);
 	node -> string = string;
 	return(node);
-} /* end UnaryNode */
+} /* end StringNode */
 
 struct NODE *
 BinaryNode(int operator, struct NODE *left, struct NODE *right)
@@ -171,8 +180,8 @@ char *
 CopyString(char *from)
 {
 	char *to;
-	to = (char *) malloc(strlen(from) + 1);
-	return(strcpy(to, from));
+	to = strdup(from);
+	return(to);
 } /* end CopyString */
 
 /*
@@ -328,7 +337,7 @@ void PrintEntityTree(struct ENTITY *root, int level)
 	} /* end switch */
 	if (root -> properties) {
 		for (i=0; i<level; i++) fprintf(stderr, "    ");
-		fprintf(stderr, "properties->%x\n", root -> properties);
+		fprintf(stderr, "properties->%p\n", root -> properties);
 	} /* end for */
 } /* end PrintEntity */
 
@@ -417,11 +426,12 @@ int CheckUnits(struct PARCEL *left, struct PARCEL *right)
 {
 	if (left -> type != VALUE_PARCEL || right -> type != VALUE_PARCEL) {
 		Trouble("type mismatch in arithmetic op");
-		return;
+		return 0;
 	} /* end if */
 	if (left -> ptr.constant -> units == right -> ptr.constant -> units)
 		return(left -> ptr.constant -> units);
 	Trouble("units mismatch in arithmetic op");
+	return(0);
 } /* end CheckUnits */
 
 float CheckFloat(struct PARCEL *theParcel)

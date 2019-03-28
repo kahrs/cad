@@ -5,9 +5,17 @@
 #include <stdio.h>
 #include <signal.h>
 #include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+
 #include "t2.h"
 
 extern int yydebug;
+extern FILE *yyin;
 
 int lineNumber;
 FILE *asStream;
@@ -26,7 +34,7 @@ int finished = 0;
 
 struct NODE *treeRoot;
 struct BUCKET *topLevel;
-struct BUCKET *symbolHashTable[];
+extern struct BUCKET *symbolHashTable[];
 struct PARCEL *topParcel;
 
 char *mktemp();
@@ -38,14 +46,19 @@ struct PARCEL *EvalParseTree();
 void EvalEntityTree();
 void PrintParcel();
 void PrintEntityTree();
+void PrintTree();
+void ProcessFile(char *filename);
+void EmitFx();
+void EmitIGES();
 
+int yyparse();
+
+int
 main(argc, argv)
 int argc;
 char **argv;
 {
-	int fd;
 	int advance = 1;
-	char *asFilename;
 
 	if (argc == 1)
 	{
@@ -80,51 +93,71 @@ top:		if (*argv[0] == '-')
 				(void) Trouble("Illegal switch '%c'; ignored", **argv);
 			} /* end switch */
 		} /* end if */
-		else
-		{
-			if ((fd = open(argv[0], 0)) != -1)
-			{
-				fileName = strdup(argv[0]);
-				close(fd);
-				asFilename = mktemp(template); /* use /tmp */
-				if (!PFlag && fork() == 0)
-					execl("/lib/cpp", "/lib/cpp", argv[0], asFilename, 0);
-				else wait(0);
-				asStream = fopen(asFilename, "r");
-				if (asStream == NULL)
-				{
-					(void) Trouble("couldn't open %s", asFilename);
-					perror("t2");
-				} /* end if */
-				else
-				{
-					finished = 0;
-					lineNumber = 1;
-					yydebug = dFlag;
-					finished = yyparse();
-					fclose(asStream);
-					unlink(asFilename);
-					if  (topLevel = Lookup(topName, symbolHashTable, SYMBOLSIZE)) {
-						if (tFlag) PrintTree(topLevel -> contents.pointer, 0);
-						topParcel = EvalParseTree(topLevel -> contents.pointer);
-						if (eFlag && (topParcel -> type == ENTITY_PARCEL)) PrintEntityTree(topParcel -> ptr.entity, 0);
-						if (fFlag) EmitFx(topParcel -> ptr.entity);
-						else EmitIGES(topParcel -> ptr.entity);
-					} /* end if */
-					else Trouble("top symbol %s not found", topName);
-				} /* end else */
-			} /* end if */
-			else
-			{
-				(void) Trouble("couldn't open %s", argv[0]);
-				perror("t2");
-			} /* end if */
-		} /* end else */
+		else ProcessFile(argv[0]);
 		argc -= advance;
 		argv += advance;
 	} /* end while */
 	(void) exit(errorCount); /* Make will halt if != 0 */
 } /* end main */
+
+void
+ProcessFile(char *filename)
+{
+	int forked;
+	int waitstatus;
+	int fd;
+	char *asFilename;
+
+	if ((fd = open(filename, 0)) != -1)
+	{
+		fileName = strdup(filename);
+		close(fd);
+		asFilename = mktemp(template); /* a symbol name is needed for /lib/cpp */
+		if (PFlag)
+			asFilename = filename;
+		else {
+			forked = fork();
+			if (forked < 0) {
+				(void) Trouble("fork failed?");
+				perror("t2");
+			}
+			else
+			if (forked == 0)
+				(void) execl("/lib/cpp", "/lib/cpp", filename, asFilename, NULL);
+			else
+				wait(&waitstatus);
+		}
+		asStream = fopen(asFilename, "r");
+		if (asStream == NULL)
+		{
+			(void) Trouble("couldn't open %s", asFilename);
+			perror("t2");
+		} /* end if */
+		else
+		{
+			yyin = asStream;
+			finished = 0;
+			lineNumber = 1;
+			yydebug = dFlag;
+			finished = yyparse();
+			fclose(asStream);
+			unlink(asFilename);
+			if  (topLevel = Lookup(topName, symbolHashTable, SYMBOLSIZE)) {
+				if (tFlag) PrintTree(topLevel -> contents.pointer, 0);
+				topParcel = EvalParseTree(topLevel -> contents.pointer);
+				if (eFlag && (topParcel -> type == ENTITY_PARCEL)) PrintEntityTree(topParcel -> ptr.entity, 0);
+				if (fFlag) EmitFx(topParcel -> ptr.entity);
+				else EmitIGES(topParcel -> ptr.entity);
+			} /* end if */
+			else Trouble("top symbol %s not found", topName);
+		} /* end else */
+	} /* end if */
+	else
+	{
+		(void) Trouble("couldn't open %s", filename);
+		perror("t2");
+	} /* end if */
+}
 
 void Error(message, firstArgument, secondArgument)
 char *message, *firstArgument, *secondArgument;
@@ -155,6 +188,7 @@ char *message;
  * yacc interface
  */
 
+void
 yyerror(message, argument)
 char *message, *argument;
 {

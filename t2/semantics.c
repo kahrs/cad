@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include "stdarg.h"
+#include <stdlib.h>
+#define YYSTYPE int
 #include "y.tab.h"
 #include "t2.h"
 #include "iges.h"
@@ -95,6 +96,12 @@ void EmitGlobals(void);
 struct DE *EmitEntity(int type, int form, int count, float f1, float f2, float f3, float f4, ...);
 struct DE *EmitPointerEntity(int type, int transform, int count, int p1, ...);
 void EmitLines(void);
+
+void Bug();
+void Trouble();
+void PushCall();
+void PopCall();
+int BindNameToParcel(char *name);
 
 char *strdup();
 
@@ -248,6 +255,7 @@ struct PARCEL *EvalConstant(struct NODE *constant)
 {
 	struct PARCEL *parcel;
 	float floatvalue;
+	int intvalue;
 	switch (constant -> left -> operator) {
 	case FLOAT:
 		parcel = NewParcel(VALUE_PARCEL);
@@ -259,6 +267,13 @@ struct PARCEL *EvalConstant(struct NODE *constant)
 	case STRING:
 		parcel = NewParcel(STRING_PARCEL);
 		parcel -> ptr.string = strdup(constant -> left -> string);
+		break;
+	case INTEGER:
+		parcel = NewParcel(VALUE_PARCEL);
+		sscanf(constant -> left -> string, "%i", &intvalue);
+		parcel -> ptr.constant = NewValue(intvalue, 0);
+		if (constant -> right != Null_struct(NODE))
+			parcel -> ptr.constant -> units = constant -> right -> operator;
 		break;
 	default:
 		fprintf(stderr, "op=%d\n", constant -> left -> operator);
