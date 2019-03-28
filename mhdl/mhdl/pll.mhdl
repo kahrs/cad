@@ -1,0 +1,96 @@
+--
+--  phase Lock Loop (with apologies to Gardner)
+--
+
+package loop_parameters
+	libraries Electrical_Engineering_Units;
+
+	dimension vco_gain_dimension = 'frequency / potential';
+	unit vco_gain_unit of vco_gain_dimension = 'Hertz / Volt';
+	attribute vco_gain : vco_gain_dimension;
+
+	dimension pd_gain_dimension = 'frequency / angle';
+	unit pd_gain_unit of pd_gain_dimension = 'Volt / radian';
+	attribute pd_gain : pd_gain_dimension;
+end loop_parameters;
+
+model divider
+	attribute N : Integer; -- divider ratio
+	structure electrical
+		connectors input, output;
+	end electrical;
+	structure frequency_domain
+		connectors input, output;
+		output.omega = input.omega / N;
+	end frequency_domain;
+end divider;
+
+model dual_modulus_divider
+	attribute N : Ratio;
+	structure electrical
+		connectors input, output, select;
+	end electrical;
+	structure frequency_domain
+		connectors input, output;
+		output.omega = input.omega / (if select then N else N+1);
+	end frequency_domain;
+end dual_modulus_divider;
+
+model first_order_filter
+	attribute H : voltage -> voltage;
+	structure electrical
+		connectors input, output, common;
+		components
+			R1 :: resistor.electrical;
+			R2 :: resistor.electrical;
+			C :: capacitor.electrical;
+		end components;
+		connect R1.p, R2.p, output;
+		connect input, R1.m;
+		connect R2.m, C.p;
+		connect C.m, common;
+	end electrical;
+	structure frequency_domain
+		connectors input, output;
+		tau_1 = (R1 + R2) * C;
+		tau_2 = R2 * C;
+		damping = 0.5 * bandwidth * (tau_2 + (1 / (K_vco * K_pd)));
+		default bandwidth = sqrt(K_vco * K_pd / tau_1);
+		H = (\(s) -> (s * tau_2 + 1) / (s * tau_1 + 1));
+		output.voltage = H * input.voltage;
+	end frequency_domain;
+end first_order_filter;
+
+model phase_lock_loop
+	attribute center_frequency : frequency;
+	attribute bandwidth : frequency;
+
+	structure electrical
+		connectors
+			ref_in, vco_in, vco_out;
+		components
+			vs :: Vsine.electrical;
+			phase_detector :: phase_detector.electrical;
+			divider :: divider.electrical;
+			filter :: filter.electrical;
+			vco :: VCO.electrical;
+		end components;
+
+		configuration typical
+			for phase_detector use mixer;
+			for filter use first_order_filter;
+		end typical;
+
+		connect vs.output, phase_detector.in1;
+		connect phase_detector.out, filter.input;
+		connect filter.out, vco.input;
+		connect vco_input, divider.input;
+		connect divider.output, phase_detector.in2;
+	end electrical;
+
+	structure frequency_domain
+		connectors ref_in, vco_in, vco_out;
+		H = (\(s) -> ( vco.K_vco * phase_detector.K_pd * filter.H(s) ) /
+		       ( s + vco.K_vco * phase_detector.K_pd * filter.H(s) ));
+	end frequency_domain;
+end phase_lock_loop;

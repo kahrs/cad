@@ -1,0 +1,82 @@
+--
+-- basic active RF components
+--
+
+model mixer
+
+	structure electrical
+		connectors in1, in2, output;
+	end electrical;
+
+	structure time_domain
+		connectors in1, in2, output;
+		output = in1 * in2;
+	end time_domain;
+
+end mixer;
+
+model phase_detector
+	attribute K_pd : pd_gain_dimension;
+
+	structure electrical
+		connectors in1, in2, output;
+	end electrical;
+
+	structure time_domain
+		output = K_pd * (in1.phase - in2.phase);
+	end time_domain;
+
+end phase_detector;
+
+model VCO
+
+	attribute f_ref : frequency;
+	attribute v_ref : voltage;
+	attribute K_vco : vco_gain_dimension;
+
+	structure electrical
+		connectors input, output;
+	end electrical;
+
+	structure time_domain
+		connectors input, output;
+		output.voltage = sin(phase)
+			where {
+				phase = integral(t)(0,t)
+					(2*pi*(f_ref + K_vco*(v_in-v_ref)));
+			};
+
+	end time_domain;
+
+end VCO;
+
+model Vsine
+
+	attribute amplitude : voltage;
+	attribute f : frequency;
+
+	structure electrical
+		connectors output;
+	end electrical;
+
+	structure time_domain
+		connectors output;
+		output.voltage = amplitude * sin(2*pi*f*t);
+	end time_domain;
+
+end Vsine;
+
+model amplifier
+
+	attribute gain : dBm;
+
+	structure electrical
+		connectors input, output;
+	end electrical;
+
+	structure time_domain
+		connectors input, output;
+		output = gain * input; -- * uses types dBm and watts
+	end time_domain;
+
+end amplifier;

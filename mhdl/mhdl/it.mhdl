@@ -1,0 +1,96 @@
+{- Intermetrics tests -}
+
+-- LRM 2.3
+
+model m
+	list1 :: List(Int);
+	list1 = [1, 2, 3];
+	for each member C in list1 generate
+		C = 1;
+	end generate;
+end m;
+
+model m
+	list1 :: Int;
+	list1 = 2;
+	for each member C in list1 generate
+		C = 1;
+	end generate;
+end m;
+
+model m
+	for each member C in [1, 2, 3] generate
+		C = 1;
+	end generate;
+end m;
+
+-- 2.4
+
+package p
+	i :: Int;
+	table params
+		title "test";
+		columns "col 1" | "col 2";
+		names Param | Value;
+		{{	gain	| 10;
+			noise	| -5;
+		}}
+	end params;
+end p;
+
+package p
+	i :: Int;
+	table params
+		title "test";
+		columns "col 1" | "col 2";
+		names Param | Value | Type; -- error
+		{{	gain	| 10;
+			noise	| -5;
+		}}
+	end params;
+end p;
+
+package p
+	i :: Int;
+	table params
+		title "test";
+		columns "col 1" | "col 2" | "col 3";
+		names Param | Value | Param; -- error
+		{{	gain	| 10;
+			noise	| -5;
+			gain	| -20; -- error
+		}}
+	end params;
+end p;
+
+-- 2.6 (we ignore duplicate loading)
+
+package p
+	libraries user_mhdl, loser_mhdl;
+end p;
+
+-- 3.2
+
+package p
+	structure struct1
+		components
+			comp1 :: struct3;
+		end components;
+		n1, n2 :: int;
+	end;
+	configuration test
+		for comp1 use struct1;
+	end test;
+end p;
+
+package p2
+	structure struct1
+		components
+			comp1 :: struct3;
+		end components;
+		n1, n2 :: int;
+	end;
+	configuration test
+		for comp2 use struct1;
+	end test;
+end p2;
