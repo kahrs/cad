@@ -1,0 +1,29 @@
+A description of the files used by espectro:
+
+elaborate.c
+	This walks the parse tree and instantiates instances and calls models.
+	All the hard work is done here.
+lex.c
+	Lexical analyzer --- the usual expression of a FSM
+matrix.c
+	Matrix routines to construct the nodal matrices needed by the PWL analysis.
+reader.c
+	Interface routines to be called by any clients of espectro
+sym.c
+	Symbol table stuff
+commands.c
+	Stubs for various commands in Espectro.  Maybe some year.
+espectro.c
+	Standalone interface
+evaluate.c
+	Expression evaluator for the parse tree.  Nothing startling.
+library.c
+	An experimental version of a external library model.  Use this as a template
+	for a dynamically loaded model.
+models.c
+	Builtin models.
+semantics.c
+	Semantic routines called by the parser
+test.c
+	Brutally simple test
+

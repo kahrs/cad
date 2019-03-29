@@ -1,0 +1,6 @@
+- fixups at the end with functions?  Why does that break bind_parameters?
+	Ans: fixup is being too aggressive... (?)
+- Unbound variables !!! Why oh why!!!
+
+- Non unique signal names ... I bet this is a bug.  Signal binding is too late.
+I was wrong, but let's watch this.

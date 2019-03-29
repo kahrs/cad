@@ -1,0 +1,3641 @@
+Terminals unused in grammar
+
+   L_LSHIFT
+   L_RSHIFT
+   L_XNOR
+   L_XOR
+
+
+State 68 conflicts: 1 shift/reduce
+State 82 conflicts: 1 shift/reduce
+State 111 conflicts: 1 shift/reduce
+State 112 conflicts: 1 shift/reduce
+State 114 conflicts: 1 shift/reduce
+State 116 conflicts: 2 shift/reduce
+State 155 conflicts: 2 shift/reduce
+State 158 conflicts: 1 shift/reduce
+State 159 conflicts: 1 shift/reduce
+State 160 conflicts: 1 shift/reduce
+State 161 conflicts: 1 shift/reduce
+State 162 conflicts: 1 shift/reduce
+State 163 conflicts: 1 shift/reduce
+State 164 conflicts: 1 shift/reduce
+State 165 conflicts: 1 shift/reduce
+State 166 conflicts: 1 shift/reduce
+State 167 conflicts: 1 shift/reduce
+State 168 conflicts: 1 shift/reduce
+State 169 conflicts: 1 shift/reduce
+State 170 conflicts: 1 shift/reduce
+State 171 conflicts: 1 shift/reduce
+State 172 conflicts: 1 shift/reduce
+State 174 conflicts: 17 shift/reduce
+State 200 conflicts: 17 shift/reduce
+
+
+Grammar
+
+    0 $accept: start $end
+
+    1 start: statement
+
+    2 statement: element
+    3          | control
+    4          | analysis
+
+    5 element: instance
+    6        | subckt
+    7        | ends
+    8        | parameters
+    9        | globals
+   10        | function
+   11        | ic
+   12        | if
+   13        | model
+
+   14 control: L_TIME_SWEEP name bindings
+   15        | L_DC_SWEEP name bindings
+   16        | L_SAVE signals
+   17        | L_SENS '(' signals ')' L_TO '(' signals ')' L_FOR '(' SYMBOL ')'
+   18        | L_SIMULATOR binding
+   19        | L_ALTERGROUP
+   20        | L_CORRELATE
+   21        | L_INCLUDE L_STRING
+   22        | L_INLINE
+   23        | L_LIBRARY L_STRING
+   24        | L_LOCAL
+   25        | L_MARCH
+   26        | L_NODESET
+   27        | L_PRINT
+   28        | L_STATISTICS
+   29        | SYMBOL L_OPTIONS optbindings
+   30        | SYMBOL L_INFO optbindings
+   31        | SYMBOL L_PARAMTEST optbindings
+   32        | SYMBOL L_TRAN optbindings
+   33        | SYMBOL L_AC optbindings
+   34        | SYMBOL L_DC optbindings
+
+   35 optbindings: binding optbindings
+   36            | special optbindings
+   37            | empty
+
+   38 special: L_SAVE '=' expr
+
+   39 analysis: name '(' nodes ')' op bindings
+
+   40 op: L_XF
+   41   | L_AC
+   42   | L_NOISE
+   43   | L_SP
+
+   44 $@1: %empty
+
+   45 instance: name '(' nodes ')' name $@1 pairings
+   46         | name L_PARAMSET '{' names exprs '}'
+
+   47 nodes: node nodes
+   48      | node
+
+   49 node: L_INT
+   50     | name
+
+   51 parameters: L_PARAMETERS bindings
+
+   52 globals: L_GLOBAL names
+
+   53 $@2: %empty
+
+   54 subckt: L_SUBCKT name $@2 subparams
+
+   55 ends: L_ENDS SYMBOL
+
+   56 subparams: '(' formals ')'
+   57          | formals
+   58          | empty
+
+   59 $@3: %empty
+
+   60 function: type name $@3 '(' formals ')' '{' body '}'
+
+   61 type: L_INTEGER
+   62     | L_REAL
+
+   63 $@4: %empty
+
+   64 $@5: %empty
+
+   65 formals: $@4 names $@5
+
+   66 body: bindings return
+
+   67 return: L_RETURN expr
+
+   68 ic: L_IC bindings
+
+   69 if: L_IF expr '{'
+   70   | L_ELSE '{'
+   71   | '}'
+
+   72 $@6: %empty
+
+   73 model: L_MODEL name name $@6 bindings
+
+   74 pairings: pairing pairings
+   75         | empty
+
+   76 pairing: insidename '=' expr
+
+   77 insidename: SYMBOL
+
+   78 bindings: binding bindings
+   79         | empty
+
+   80 binding: lname '=' expr
+
+   81 names: name names
+   82      | name
+
+   83 lname: SYMBOL
+
+   84 name: SYMBOL
+
+   85 signals: signal signals
+   86        | signal
+
+   87 signal: SYMBOL
+
+   88 parameters: parameter parameters
+   89           | empty
+
+   90 parameter: name
+   91          | L_STRING
+   92          | binding
+
+   93 exprs: exprs expr
+   94      | expr
+
+   95 list: expr ',' list
+   96     | expr
+
+   97 expr: name
+   98     | name '(' list ')'
+   99     | '(' expr ')'
+  100     | expr '+' expr
+  101     | expr '-' expr
+  102     | expr '*' expr
+  103     | expr '/' expr
+  104     | expr '%' expr
+  105     | expr L_EXP expr
+  106     | '+' expr
+  107     | '-' expr
+  108     | '!' expr
+  109     | expr '&' expr
+  110     | expr L_AND expr
+  111     | expr '|' expr
+  112     | expr L_OR expr
+  113     | expr L_GT expr
+  114     | expr L_GE expr
+  115     | expr L_LT expr
+  116     | expr L_LE expr
+  117     | expr L_EQ expr
+  118     | expr L_NE expr
+  119     | expr '?' expr ':' expr
+  120     | L_STRING
+  121     | L_INT
+  122     | L_FLOAT
+  123     | '[' exprs ']'
+
+  124 empty: %empty
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'!' (33) 108
+'%' (37) 104
+'&' (38) 109
+'(' (40) 17 39 45 56 60 98 99
+')' (41) 17 39 45 56 60 98 99
+'*' (42) 102
+'+' (43) 100 106
+',' (44) 95
+'-' (45) 101 107
+'/' (47) 103
+':' (58) 119
+'=' (61) 38 76 80
+'?' (63) 119
+'[' (91) 123
+']' (93) 123
+'{' (123) 46 60 69 70
+'|' (124) 111
+'}' (125) 46 60 71
+error (256)
+SYMBOL (258) 17 29 30 31 32 33 34 55 77 83 84 87
+L_STRING (259) 21 23 91 120
+L_INT (260) 49 121
+L_FLOAT (261) 122
+L_TIME_SWEEP (262) 14
+L_DC_SWEEP (263) 15
+L_SAVE (264) 16 38
+L_SENS (265) 17
+L_TO (266) 17
+L_FOR (267) 17
+L_SIMULATOR (268) 18
+L_PARAMSET (269) 46
+L_PARAMETERS (270) 51
+L_GLOBAL (271) 52
+L_SUBCKT (272) 54
+L_ENDS (273) 55
+L_INTEGER (274) 61
+L_REAL (275) 62
+L_RETURN (276) 67
+L_DC (277) 34
+L_CORRELATE (278) 20
+L_INCLUDE (279) 21
+L_INLINE (280) 22
+L_LIBRARY (281) 23
+L_LOCAL (282) 24
+L_MARCH (283) 25
+L_NODESET (284) 26
+L_PRINT (285) 27
+L_STATISTICS (286) 28
+L_IC (287) 68
+L_IF (288) 69
+L_MODEL (289) 73
+L_ALTERGROUP (290) 19
+L_XF (291) 40
+L_AC (292) 33 41
+L_NOISE (293) 42
+L_SP (294) 43
+L_INFO (295) 30
+L_OPTIONS (296) 29
+L_PARAMTEST (297) 31
+L_ELSE (298) 70
+L_TRAN (299) 32
+L_UMINUS (300)
+L_UPLUS (301)
+L_EXP (302) 105
+L_LSHIFT (303)
+L_RSHIFT (304)
+L_GT (305) 113
+L_GE (306) 114
+L_LT (307) 115
+L_LE (308) 116
+L_EQ (309) 117
+L_NE (310) 118
+L_XNOR (311)
+L_XOR (312)
+L_AND (313) 110
+L_OR (314) 112
+
+
+Nonterminals, with rules where they appear
+
+$accept (78)
+    on left: 0
+start (79)
+    on left: 1, on right: 0
+statement (80)
+    on left: 2 3 4, on right: 1
+element (81)
+    on left: 5 6 7 8 9 10 11 12 13, on right: 2
+control (82)
+    on left: 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+    32 33 34, on right: 3
+optbindings (83)
+    on left: 35 36 37, on right: 29 30 31 32 33 34 35 36
+special (84)
+    on left: 38, on right: 36
+analysis (85)
+    on left: 39, on right: 4
+op (86)
+    on left: 40 41 42 43, on right: 39
+instance (87)
+    on left: 45 46, on right: 5
+$@1 (88)
+    on left: 44, on right: 45
+nodes (89)
+    on left: 47 48, on right: 39 45 47
+node (90)
+    on left: 49 50, on right: 47 48
+parameters (91)
+    on left: 51 88 89, on right: 8 88
+globals (92)
+    on left: 52, on right: 9
+subckt (93)
+    on left: 54, on right: 6
+$@2 (94)
+    on left: 53, on right: 54
+ends (95)
+    on left: 55, on right: 7
+subparams (96)
+    on left: 56 57 58, on right: 54
+function (97)
+    on left: 60, on right: 10
+$@3 (98)
+    on left: 59, on right: 60
+type (99)
+    on left: 61 62, on right: 60
+formals (100)
+    on left: 65, on right: 56 57 60
+$@4 (101)
+    on left: 63, on right: 65
+$@5 (102)
+    on left: 64, on right: 65
+body (103)
+    on left: 66, on right: 60
+return (104)
+    on left: 67, on right: 66
+ic (105)
+    on left: 68, on right: 11
+if (106)
+    on left: 69 70 71, on right: 12
+model (107)
+    on left: 73, on right: 13
+$@6 (108)
+    on left: 72, on right: 73
+pairings (109)
+    on left: 74 75, on right: 45 74
+pairing (110)
+    on left: 76, on right: 74
+insidename (111)
+    on left: 77, on right: 76
+bindings (112)
+    on left: 78 79, on right: 14 15 39 51 66 68 73 78
+binding (113)
+    on left: 80, on right: 18 35 78 92
+names (114)
+    on left: 81 82, on right: 46 52 65 81
+lname (115)
+    on left: 83, on right: 80
+name (116)
+    on left: 84, on right: 14 15 39 45 46 50 54 60 73 81 82 90 97 98
+signals (117)
+    on left: 85 86, on right: 16 17 85
+signal (118)
+    on left: 87, on right: 85 86
+parameter (119)
+    on left: 90 91 92, on right: 88
+exprs (120)
+    on left: 93 94, on right: 46 93 123
+list (121)
+    on left: 95 96, on right: 95 98
+expr (122)
+    on left: 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111
+    112 113 114 115 116 117 118 119 120 121 122 123, on right: 38 67
+    69 76 80 93 94 95 96 99 100 101 102 103 104 105 106 107 108 109
+    110 111 112 113 114 115 116 117 118 119
+empty (123)
+    on left: 124, on right: 37 58 75 79 89
+
+
+State 0
+
+    0 $accept: . start $end
+
+    SYMBOL        shift, and go to state 1
+    L_STRING      shift, and go to state 2
+    L_TIME_SWEEP  shift, and go to state 3
+    L_DC_SWEEP    shift, and go to state 4
+    L_SAVE        shift, and go to state 5
+    L_SENS        shift, and go to state 6
+    L_SIMULATOR   shift, and go to state 7
+    L_PARAMETERS  shift, and go to state 8
+    L_GLOBAL      shift, and go to state 9
+    L_SUBCKT      shift, and go to state 10
+    L_ENDS        shift, and go to state 11
+    L_INTEGER     shift, and go to state 12
+    L_REAL        shift, and go to state 13
+    L_CORRELATE   shift, and go to state 14
+    L_INCLUDE     shift, and go to state 15
+    L_INLINE      shift, and go to state 16
+    L_LIBRARY     shift, and go to state 17
+    L_LOCAL       shift, and go to state 18
+    L_MARCH       shift, and go to state 19
+    L_NODESET     shift, and go to state 20
+    L_PRINT       shift, and go to state 21
+    L_STATISTICS  shift, and go to state 22
+    L_IC          shift, and go to state 23
+    L_IF          shift, and go to state 24
+    L_MODEL       shift, and go to state 25
+    L_ALTERGROUP  shift, and go to state 26
+    L_ELSE        shift, and go to state 27
+    '}'           shift, and go to state 28
+
+    $default  reduce using rule 124 (empty)
+
+    start       go to state 29
+    statement   go to state 30
+    element     go to state 31
+    control     go to state 32
+    analysis    go to state 33
+    instance    go to state 34
+    parameters  go to state 35
+    globals     go to state 36
+    subckt      go to state 37
+    ends        go to state 38
+    function    go to state 39
+    type        go to state 40
+    ic          go to state 41
+    if          go to state 42
+    model       go to state 43
+    binding     go to state 44
+    lname       go to state 45
+    name        go to state 46
+    parameter   go to state 47
+    empty       go to state 48
+
+
+State 1
+
+   29 control: SYMBOL . L_OPTIONS optbindings
+   30        | SYMBOL . L_INFO optbindings
+   31        | SYMBOL . L_PARAMTEST optbindings
+   32        | SYMBOL . L_TRAN optbindings
+   33        | SYMBOL . L_AC optbindings
+   34        | SYMBOL . L_DC optbindings
+   83 lname: SYMBOL .
+   84 name: SYMBOL .
+
+    L_DC         shift, and go to state 49
+    L_AC         shift, and go to state 50
+    L_INFO       shift, and go to state 51
+    L_OPTIONS    shift, and go to state 52
+    L_PARAMTEST  shift, and go to state 53
+    L_TRAN       shift, and go to state 54
+
+    '='       reduce using rule 83 (lname)
+    $default  reduce using rule 84 (name)
+
+
+State 2
+
+   91 parameter: L_STRING .
+
+    $default  reduce using rule 91 (parameter)
+
+
+State 3
+
+   14 control: L_TIME_SWEEP . name bindings
+
+    SYMBOL  shift, and go to state 55
+
+    name  go to state 56
+
+
+State 4
+
+   15 control: L_DC_SWEEP . name bindings
+
+    SYMBOL  shift, and go to state 55
+
+    name  go to state 57
+
+
+State 5
+
+   16 control: L_SAVE . signals
+
+    SYMBOL  shift, and go to state 58
+
+    signals  go to state 59
+    signal   go to state 60
+
+
+State 6
+
+   17 control: L_SENS . '(' signals ')' L_TO '(' signals ')' L_FOR '(' SYMBOL ')'
+
+    '('  shift, and go to state 61
+
+
+State 7
+
+   18 control: L_SIMULATOR . binding
+
+    SYMBOL  shift, and go to state 62
+
+    binding  go to state 63
+    lname    go to state 45
+
+
+State 8
+
+   51 parameters: L_PARAMETERS . bindings
+
+    SYMBOL  shift, and go to state 62
+
+    $default  reduce using rule 124 (empty)
+
+    bindings  go to state 64
+    binding   go to state 65
+    lname     go to state 45
+    empty     go to state 66
+
+
+State 9
+
+   52 globals: L_GLOBAL . names
+
+    SYMBOL  shift, and go to state 55
+
+    names  go to state 67
+    name   go to state 68
+
+
+State 10
+
+   54 subckt: L_SUBCKT . name $@2 subparams
+
+    SYMBOL  shift, and go to state 55
+
+    name  go to state 69
+
+
+State 11
+
+   55 ends: L_ENDS . SYMBOL
+
+    SYMBOL  shift, and go to state 70
+
+
+State 12
+
+   61 type: L_INTEGER .
+
+    $default  reduce using rule 61 (type)
+
+
+State 13
+
+   62 type: L_REAL .
+
+    $default  reduce using rule 62 (type)
+
+
+State 14
+
+   20 control: L_CORRELATE .
+
+    $default  reduce using rule 20 (control)
+
+
+State 15
+
+   21 control: L_INCLUDE . L_STRING
+
+    L_STRING  shift, and go to state 71
+
+
+State 16
+
+   22 control: L_INLINE .
+
+    $default  reduce using rule 22 (control)
+
+
+State 17
+
+   23 control: L_LIBRARY . L_STRING
+
+    L_STRING  shift, and go to state 72
+
+
+State 18
+
+   24 control: L_LOCAL .
+
+    $default  reduce using rule 24 (control)
+
+
+State 19
+
+   25 control: L_MARCH .
+
+    $default  reduce using rule 25 (control)
+
+
+State 20
+
+   26 control: L_NODESET .
+
+    $default  reduce using rule 26 (control)
+
+
+State 21
+
+   27 control: L_PRINT .
+
+    $default  reduce using rule 27 (control)
+
+
+State 22
+
+   28 control: L_STATISTICS .
+
+    $default  reduce using rule 28 (control)
+
+
+State 23
+
+   68 ic: L_IC . bindings
+
+    SYMBOL  shift, and go to state 62
+
+    $default  reduce using rule 124 (empty)
+
+    bindings  go to state 73
+    binding   go to state 65
+    lname     go to state 45
+    empty     go to state 66
+
+
+State 24
+
+   69 if: L_IF . expr '{'
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 83
+
+
+State 25
+
+   73 model: L_MODEL . name name $@6 bindings
+
+    SYMBOL  shift, and go to state 55
+
+    name  go to state 84
+
+
+State 26
+
+   19 control: L_ALTERGROUP .
+
+    $default  reduce using rule 19 (control)
+
+
+State 27
+
+   70 if: L_ELSE . '{'
+
+    '{'  shift, and go to state 85
+
+
+State 28
+
+   71 if: '}' .
+
+    $default  reduce using rule 71 (if)
+
+
+State 29
+
+    0 $accept: start . $end
+
+    $end  shift, and go to state 86
+
+
+State 30
+
+    1 start: statement .
+
+    $default  reduce using rule 1 (start)
+
+
+State 31
+
+    2 statement: element .
+
+    $default  reduce using rule 2 (statement)
+
+
+State 32
+
+    3 statement: control .
+
+    $default  reduce using rule 3 (statement)
+
+
+State 33
+
+    4 statement: analysis .
+
+    $default  reduce using rule 4 (statement)
+
+
+State 34
+
+    5 element: instance .
+
+    $default  reduce using rule 5 (element)
+
+
+State 35
+
+    8 element: parameters .
+
+    $default  reduce using rule 8 (element)
+
+
+State 36
+
+    9 element: globals .
+
+    $default  reduce using rule 9 (element)
+
+
+State 37
+
+    6 element: subckt .
+
+    $default  reduce using rule 6 (element)
+
+
+State 38
+
+    7 element: ends .
+
+    $default  reduce using rule 7 (element)
+
+
+State 39
+
+   10 element: function .
+
+    $default  reduce using rule 10 (element)
+
+
+State 40
+
+   60 function: type . name $@3 '(' formals ')' '{' body '}'
+
+    SYMBOL  shift, and go to state 55
+
+    name  go to state 87
+
+
+State 41
+
+   11 element: ic .
+
+    $default  reduce using rule 11 (element)
+
+
+State 42
+
+   12 element: if .
+
+    $default  reduce using rule 12 (element)
+
+
+State 43
+
+   13 element: model .
+
+    $default  reduce using rule 13 (element)
+
+
+State 44
+
+   92 parameter: binding .
+
+    $default  reduce using rule 92 (parameter)
+
+
+State 45
+
+   80 binding: lname . '=' expr
+
+    '='  shift, and go to state 88
+
+
+State 46
+
+   39 analysis: name . '(' nodes ')' op bindings
+   45 instance: name . '(' nodes ')' name $@1 pairings
+   46         | name . L_PARAMSET '{' names exprs '}'
+   90 parameter: name .
+
+    L_PARAMSET  shift, and go to state 89
+    '('         shift, and go to state 90
+
+    $default  reduce using rule 90 (parameter)
+
+
+State 47
+
+   88 parameters: parameter . parameters
+
+    SYMBOL        shift, and go to state 91
+    L_STRING      shift, and go to state 2
+    L_PARAMETERS  shift, and go to state 8
+
+    $default  reduce using rule 124 (empty)
+
+    parameters  go to state 92
+    binding     go to state 44
+    lname       go to state 45
+    name        go to state 93
+    parameter   go to state 47
+    empty       go to state 48
+
+
+State 48
+
+   89 parameters: empty .
+
+    $default  reduce using rule 89 (parameters)
+
+
+State 49
+
+   34 control: SYMBOL L_DC . optbindings
+
+    SYMBOL  shift, and go to state 62
+    L_SAVE  shift, and go to state 94
+
+    $default  reduce using rule 124 (empty)
+
+    optbindings  go to state 95
+    special      go to state 96
+    binding      go to state 97
+    lname        go to state 45
+    empty        go to state 98
+
+
+State 50
+
+   33 control: SYMBOL L_AC . optbindings
+
+    SYMBOL  shift, and go to state 62
+    L_SAVE  shift, and go to state 94
+
+    $default  reduce using rule 124 (empty)
+
+    optbindings  go to state 99
+    special      go to state 96
+    binding      go to state 97
+    lname        go to state 45
+    empty        go to state 98
+
+
+State 51
+
+   30 control: SYMBOL L_INFO . optbindings
+
+    SYMBOL  shift, and go to state 62
+    L_SAVE  shift, and go to state 94
+
+    $default  reduce using rule 124 (empty)
+
+    optbindings  go to state 100
+    special      go to state 96
+    binding      go to state 97
+    lname        go to state 45
+    empty        go to state 98
+
+
+State 52
+
+   29 control: SYMBOL L_OPTIONS . optbindings
+
+    SYMBOL  shift, and go to state 62
+    L_SAVE  shift, and go to state 94
+
+    $default  reduce using rule 124 (empty)
+
+    optbindings  go to state 101
+    special      go to state 96
+    binding      go to state 97
+    lname        go to state 45
+    empty        go to state 98
+
+
+State 53
+
+   31 control: SYMBOL L_PARAMTEST . optbindings
+
+    SYMBOL  shift, and go to state 62
+    L_SAVE  shift, and go to state 94
+
+    $default  reduce using rule 124 (empty)
+
+    optbindings  go to state 102
+    special      go to state 96
+    binding      go to state 97
+    lname        go to state 45
+    empty        go to state 98
+
+
+State 54
+
+   32 control: SYMBOL L_TRAN . optbindings
+
+    SYMBOL  shift, and go to state 62
+    L_SAVE  shift, and go to state 94
+
+    $default  reduce using rule 124 (empty)
+
+    optbindings  go to state 103
+    special      go to state 96
+    binding      go to state 97
+    lname        go to state 45
+    empty        go to state 98
+
+
+State 55
+
+   84 name: SYMBOL .
+
+    $default  reduce using rule 84 (name)
+
+
+State 56
+
+   14 control: L_TIME_SWEEP name . bindings
+
+    SYMBOL  shift, and go to state 62
+
+    $default  reduce using rule 124 (empty)
+
+    bindings  go to state 104
+    binding   go to state 65
+    lname     go to state 45
+    empty     go to state 66
+
+
+State 57
+
+   15 control: L_DC_SWEEP name . bindings
+
+    SYMBOL  shift, and go to state 62
+
+    $default  reduce using rule 124 (empty)
+
+    bindings  go to state 105
+    binding   go to state 65
+    lname     go to state 45
+    empty     go to state 66
+
+
+State 58
+
+   87 signal: SYMBOL .
+
+    $default  reduce using rule 87 (signal)
+
+
+State 59
+
+   16 control: L_SAVE signals .
+
+    $default  reduce using rule 16 (control)
+
+
+State 60
+
+   85 signals: signal . signals
+   86        | signal .
+
+    SYMBOL  shift, and go to state 58
+
+    $default  reduce using rule 86 (signals)
+
+    signals  go to state 106
+    signal   go to state 60
+
+
+State 61
+
+   17 control: L_SENS '(' . signals ')' L_TO '(' signals ')' L_FOR '(' SYMBOL ')'
+
+    SYMBOL  shift, and go to state 58
+
+    signals  go to state 107
+    signal   go to state 60
+
+
+State 62
+
+   83 lname: SYMBOL .
+
+    $default  reduce using rule 83 (lname)
+
+
+State 63
+
+   18 control: L_SIMULATOR binding .
+
+    $default  reduce using rule 18 (control)
+
+
+State 64
+
+   51 parameters: L_PARAMETERS bindings .
+
+    $default  reduce using rule 51 (parameters)
+
+
+State 65
+
+   78 bindings: binding . bindings
+
+    SYMBOL  shift, and go to state 62
+
+    $default  reduce using rule 124 (empty)
+
+    bindings  go to state 108
+    binding   go to state 65
+    lname     go to state 45
+    empty     go to state 66
+
+
+State 66
+
+   79 bindings: empty .
+
+    $default  reduce using rule 79 (bindings)
+
+
+State 67
+
+   52 globals: L_GLOBAL names .
+
+    $default  reduce using rule 52 (globals)
+
+
+State 68
+
+   81 names: name . names
+   82      | name .
+
+    SYMBOL  shift, and go to state 55
+
+    SYMBOL    [reduce using rule 82 (names)]
+    $default  reduce using rule 82 (names)
+
+    names  go to state 109
+    name   go to state 68
+
+
+State 69
+
+   54 subckt: L_SUBCKT name . $@2 subparams
+
+    $default  reduce using rule 53 ($@2)
+
+    $@2  go to state 110
+
+
+State 70
+
+   55 ends: L_ENDS SYMBOL .
+
+    $default  reduce using rule 55 (ends)
+
+
+State 71
+
+   21 control: L_INCLUDE L_STRING .
+
+    $default  reduce using rule 21 (control)
+
+
+State 72
+
+   23 control: L_LIBRARY L_STRING .
+
+    $default  reduce using rule 23 (control)
+
+
+State 73
+
+   68 ic: L_IC bindings .
+
+    $default  reduce using rule 68 (ic)
+
+
+State 74
+
+  120 expr: L_STRING .
+
+    $default  reduce using rule 120 (expr)
+
+
+State 75
+
+  121 expr: L_INT .
+
+    $default  reduce using rule 121 (expr)
+
+
+State 76
+
+  122 expr: L_FLOAT .
+
+    $default  reduce using rule 122 (expr)
+
+
+State 77
+
+  106 expr: '+' . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 111
+
+
+State 78
+
+  107 expr: '-' . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 112
+
+
+State 79
+
+   99 expr: '(' . expr ')'
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 113
+
+
+State 80
+
+  108 expr: '!' . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 114
+
+
+State 81
+
+  123 expr: '[' . exprs ']'
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name   go to state 82
+    exprs  go to state 115
+    expr   go to state 116
+
+
+State 82
+
+   97 expr: name .
+   98     | name . '(' list ')'
+
+    '('  shift, and go to state 117
+
+    '('       [reduce using rule 97 (expr)]
+    $default  reduce using rule 97 (expr)
+
+
+State 83
+
+   69 if: L_IF expr . '{'
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '{'    shift, and go to state 134
+    '|'    shift, and go to state 135
+
+
+State 84
+
+   73 model: L_MODEL name . name $@6 bindings
+
+    SYMBOL  shift, and go to state 55
+
+    name  go to state 136
+
+
+State 85
+
+   70 if: L_ELSE '{' .
+
+    $default  reduce using rule 70 (if)
+
+
+State 86
+
+    0 $accept: start $end .
+
+    $default  accept
+
+
+State 87
+
+   60 function: type name . $@3 '(' formals ')' '{' body '}'
+
+    $default  reduce using rule 59 ($@3)
+
+    $@3  go to state 137
+
+
+State 88
+
+   80 binding: lname '=' . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 138
+
+
+State 89
+
+   46 instance: name L_PARAMSET . '{' names exprs '}'
+
+    '{'  shift, and go to state 139
+
+
+State 90
+
+   39 analysis: name '(' . nodes ')' op bindings
+   45 instance: name '(' . nodes ')' name $@1 pairings
+
+    SYMBOL  shift, and go to state 55
+    L_INT   shift, and go to state 140
+
+    nodes  go to state 141
+    node   go to state 142
+    name   go to state 143
+
+
+State 91
+
+   83 lname: SYMBOL .
+   84 name: SYMBOL .
+
+    '='       reduce using rule 83 (lname)
+    $default  reduce using rule 84 (name)
+
+
+State 92
+
+   88 parameters: parameter parameters .
+
+    $default  reduce using rule 88 (parameters)
+
+
+State 93
+
+   90 parameter: name .
+
+    $default  reduce using rule 90 (parameter)
+
+
+State 94
+
+   38 special: L_SAVE . '=' expr
+
+    '='  shift, and go to state 144
+
+
+State 95
+
+   34 control: SYMBOL L_DC optbindings .
+
+    $default  reduce using rule 34 (control)
+
+
+State 96
+
+   36 optbindings: special . optbindings
+
+    SYMBOL  shift, and go to state 62
+    L_SAVE  shift, and go to state 94
+
+    $default  reduce using rule 124 (empty)
+
+    optbindings  go to state 145
+    special      go to state 96
+    binding      go to state 97
+    lname        go to state 45
+    empty        go to state 98
+
+
+State 97
+
+   35 optbindings: binding . optbindings
+
+    SYMBOL  shift, and go to state 62
+    L_SAVE  shift, and go to state 94
+
+    $default  reduce using rule 124 (empty)
+
+    optbindings  go to state 146
+    special      go to state 96
+    binding      go to state 97
+    lname        go to state 45
+    empty        go to state 98
+
+
+State 98
+
+   37 optbindings: empty .
+
+    $default  reduce using rule 37 (optbindings)
+
+
+State 99
+
+   33 control: SYMBOL L_AC optbindings .
+
+    $default  reduce using rule 33 (control)
+
+
+State 100
+
+   30 control: SYMBOL L_INFO optbindings .
+
+    $default  reduce using rule 30 (control)
+
+
+State 101
+
+   29 control: SYMBOL L_OPTIONS optbindings .
+
+    $default  reduce using rule 29 (control)
+
+
+State 102
+
+   31 control: SYMBOL L_PARAMTEST optbindings .
+
+    $default  reduce using rule 31 (control)
+
+
+State 103
+
+   32 control: SYMBOL L_TRAN optbindings .
+
+    $default  reduce using rule 32 (control)
+
+
+State 104
+
+   14 control: L_TIME_SWEEP name bindings .
+
+    $default  reduce using rule 14 (control)
+
+
+State 105
+
+   15 control: L_DC_SWEEP name bindings .
+
+    $default  reduce using rule 15 (control)
+
+
+State 106
+
+   85 signals: signal signals .
+
+    $default  reduce using rule 85 (signals)
+
+
+State 107
+
+   17 control: L_SENS '(' signals . ')' L_TO '(' signals ')' L_FOR '(' SYMBOL ')'
+
+    ')'  shift, and go to state 147
+
+
+State 108
+
+   78 bindings: binding bindings .
+
+    $default  reduce using rule 78 (bindings)
+
+
+State 109
+
+   81 names: name names .
+
+    $default  reduce using rule 81 (names)
+
+
+State 110
+
+   54 subckt: L_SUBCKT name $@2 . subparams
+
+    '('  shift, and go to state 148
+
+    $end      reduce using rule 124 (empty)
+    $default  reduce using rule 63 ($@4)
+
+    subparams  go to state 149
+    formals    go to state 150
+    $@4        go to state 151
+    empty      go to state 152
+
+
+State 111
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  106     | '+' expr .
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 106 (expr)]
+    $default  reduce using rule 106 (expr)
+
+
+State 112
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  107     | '-' expr .
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 107 (expr)]
+    $default  reduce using rule 107 (expr)
+
+
+State 113
+
+   99 expr: '(' expr . ')'
+  100     | expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    ')'    shift, and go to state 153
+    '|'    shift, and go to state 135
+
+
+State 114
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  108     | '!' expr .
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 108 (expr)]
+    $default  reduce using rule 108 (expr)
+
+
+State 115
+
+   93 exprs: exprs . expr
+  123 expr: '[' exprs . ']'
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+    ']'       shift, and go to state 154
+
+    name  go to state 82
+    expr  go to state 155
+
+
+State 116
+
+   94 exprs: expr .
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '+'       [reduce using rule 94 (exprs)]
+    '-'       [reduce using rule 94 (exprs)]
+    $default  reduce using rule 94 (exprs)
+
+
+State 117
+
+   98 expr: name '(' . list ')'
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    list  go to state 156
+    expr  go to state 157
+
+
+State 118
+
+  105 expr: expr L_EXP . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 158
+
+
+State 119
+
+  102 expr: expr '*' . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 159
+
+
+State 120
+
+  103 expr: expr '/' . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 160
+
+
+State 121
+
+  104 expr: expr '%' . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 161
+
+
+State 122
+
+  100 expr: expr '+' . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 162
+
+
+State 123
+
+  101 expr: expr '-' . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 163
+
+
+State 124
+
+  113 expr: expr L_GT . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 164
+
+
+State 125
+
+  114 expr: expr L_GE . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 165
+
+
+State 126
+
+  115 expr: expr L_LT . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 166
+
+
+State 127
+
+  116 expr: expr L_LE . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 167
+
+
+State 128
+
+  117 expr: expr L_EQ . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 168
+
+
+State 129
+
+  118 expr: expr L_NE . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 169
+
+
+State 130
+
+  109 expr: expr '&' . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 170
+
+
+State 131
+
+  110 expr: expr L_AND . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 171
+
+
+State 132
+
+  112 expr: expr L_OR . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 172
+
+
+State 133
+
+  119 expr: expr '?' . expr ':' expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 173
+
+
+State 134
+
+   69 if: L_IF expr '{' .
+
+    $default  reduce using rule 69 (if)
+
+
+State 135
+
+  111 expr: expr '|' . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 174
+
+
+State 136
+
+   73 model: L_MODEL name name . $@6 bindings
+
+    $default  reduce using rule 72 ($@6)
+
+    $@6  go to state 175
+
+
+State 137
+
+   60 function: type name $@3 . '(' formals ')' '{' body '}'
+
+    '('  shift, and go to state 176
+
+
+State 138
+
+   80 binding: lname '=' expr .
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    $default  reduce using rule 80 (binding)
+
+
+State 139
+
+   46 instance: name L_PARAMSET '{' . names exprs '}'
+
+    SYMBOL  shift, and go to state 55
+
+    names  go to state 177
+    name   go to state 68
+
+
+State 140
+
+   49 node: L_INT .
+
+    $default  reduce using rule 49 (node)
+
+
+State 141
+
+   39 analysis: name '(' nodes . ')' op bindings
+   45 instance: name '(' nodes . ')' name $@1 pairings
+
+    ')'  shift, and go to state 178
+
+
+State 142
+
+   47 nodes: node . nodes
+   48      | node .
+
+    SYMBOL  shift, and go to state 55
+    L_INT   shift, and go to state 140
+
+    $default  reduce using rule 48 (nodes)
+
+    nodes  go to state 179
+    node   go to state 142
+    name   go to state 143
+
+
+State 143
+
+   50 node: name .
+
+    $default  reduce using rule 50 (node)
+
+
+State 144
+
+   38 special: L_SAVE '=' . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 180
+
+
+State 145
+
+   36 optbindings: special optbindings .
+
+    $default  reduce using rule 36 (optbindings)
+
+
+State 146
+
+   35 optbindings: binding optbindings .
+
+    $default  reduce using rule 35 (optbindings)
+
+
+State 147
+
+   17 control: L_SENS '(' signals ')' . L_TO '(' signals ')' L_FOR '(' SYMBOL ')'
+
+    L_TO  shift, and go to state 181
+
+
+State 148
+
+   56 subparams: '(' . formals ')'
+
+    $default  reduce using rule 63 ($@4)
+
+    formals  go to state 182
+    $@4      go to state 151
+
+
+State 149
+
+   54 subckt: L_SUBCKT name $@2 subparams .
+
+    $default  reduce using rule 54 (subckt)
+
+
+State 150
+
+   57 subparams: formals .
+
+    $default  reduce using rule 57 (subparams)
+
+
+State 151
+
+   65 formals: $@4 . names $@5
+
+    SYMBOL  shift, and go to state 55
+
+    names  go to state 183
+    name   go to state 68
+
+
+State 152
+
+   58 subparams: empty .
+
+    $default  reduce using rule 58 (subparams)
+
+
+State 153
+
+   99 expr: '(' expr ')' .
+
+    $default  reduce using rule 99 (expr)
+
+
+State 154
+
+  123 expr: '[' exprs ']' .
+
+    $default  reduce using rule 123 (expr)
+
+
+State 155
+
+   93 exprs: exprs expr .
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '+'       [reduce using rule 93 (exprs)]
+    '-'       [reduce using rule 93 (exprs)]
+    $default  reduce using rule 93 (exprs)
+
+
+State 156
+
+   98 expr: name '(' list . ')'
+
+    ')'  shift, and go to state 184
+
+
+State 157
+
+   95 list: expr . ',' list
+   96     | expr .
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    ','    shift, and go to state 185
+    '|'    shift, and go to state 135
+
+    $default  reduce using rule 96 (list)
+
+
+State 158
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  105     | expr L_EXP expr .
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 105 (expr)]
+    $default  reduce using rule 105 (expr)
+
+
+State 159
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  102     | expr '*' expr .
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 102 (expr)]
+    $default  reduce using rule 102 (expr)
+
+
+State 160
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  103     | expr '/' expr .
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 103 (expr)]
+    $default  reduce using rule 103 (expr)
+
+
+State 161
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  104     | expr '%' expr .
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 104 (expr)]
+    $default  reduce using rule 104 (expr)
+
+
+State 162
+
+  100 expr: expr . '+' expr
+  100     | expr '+' expr .
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 100 (expr)]
+    $default  reduce using rule 100 (expr)
+
+
+State 163
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  101     | expr '-' expr .
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 101 (expr)]
+    $default  reduce using rule 101 (expr)
+
+
+State 164
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  113     | expr L_GT expr .
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 113 (expr)]
+    $default  reduce using rule 113 (expr)
+
+
+State 165
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  114     | expr L_GE expr .
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 114 (expr)]
+    $default  reduce using rule 114 (expr)
+
+
+State 166
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  115     | expr L_LT expr .
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 115 (expr)]
+    $default  reduce using rule 115 (expr)
+
+
+State 167
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  116     | expr L_LE expr .
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 116 (expr)]
+    $default  reduce using rule 116 (expr)
+
+
+State 168
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  117     | expr L_EQ expr .
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 117 (expr)]
+    $default  reduce using rule 117 (expr)
+
+
+State 169
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  118     | expr L_NE expr .
+  119     | expr . '?' expr ':' expr
+
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 118 (expr)]
+    $default  reduce using rule 118 (expr)
+
+
+State 170
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  109     | expr '&' expr .
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    '|'       [reduce using rule 109 (expr)]
+    $default  reduce using rule 109 (expr)
+
+
+State 171
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  110     | expr L_AND expr .
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    '?'  shift, and go to state 133
+    '|'  shift, and go to state 135
+
+    '|'       [reduce using rule 110 (expr)]
+    $default  reduce using rule 110 (expr)
+
+
+State 172
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  112     | expr L_OR expr .
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    '?'  shift, and go to state 133
+    '|'  shift, and go to state 135
+
+    '|'       [reduce using rule 112 (expr)]
+    $default  reduce using rule 112 (expr)
+
+
+State 173
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+  119     | expr '?' expr . ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+    ':'    shift, and go to state 186
+
+
+State 174
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  111     | expr '|' expr .
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    L_EXP     [reduce using rule 111 (expr)]
+    '*'       [reduce using rule 111 (expr)]
+    '/'       [reduce using rule 111 (expr)]
+    '%'       [reduce using rule 111 (expr)]
+    '+'       [reduce using rule 111 (expr)]
+    '-'       [reduce using rule 111 (expr)]
+    L_GT      [reduce using rule 111 (expr)]
+    L_GE      [reduce using rule 111 (expr)]
+    L_LT      [reduce using rule 111 (expr)]
+    L_LE      [reduce using rule 111 (expr)]
+    L_EQ      [reduce using rule 111 (expr)]
+    L_NE      [reduce using rule 111 (expr)]
+    '&'       [reduce using rule 111 (expr)]
+    L_AND     [reduce using rule 111 (expr)]
+    L_OR      [reduce using rule 111 (expr)]
+    '?'       [reduce using rule 111 (expr)]
+    '|'       [reduce using rule 111 (expr)]
+    $default  reduce using rule 111 (expr)
+
+
+State 175
+
+   73 model: L_MODEL name name $@6 . bindings
+
+    SYMBOL  shift, and go to state 62
+
+    $default  reduce using rule 124 (empty)
+
+    bindings  go to state 187
+    binding   go to state 65
+    lname     go to state 45
+    empty     go to state 66
+
+
+State 176
+
+   60 function: type name $@3 '(' . formals ')' '{' body '}'
+
+    $default  reduce using rule 63 ($@4)
+
+    formals  go to state 188
+    $@4      go to state 151
+
+
+State 177
+
+   46 instance: name L_PARAMSET '{' names . exprs '}'
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name   go to state 82
+    exprs  go to state 189
+    expr   go to state 116
+
+
+State 178
+
+   39 analysis: name '(' nodes ')' . op bindings
+   45 instance: name '(' nodes ')' . name $@1 pairings
+
+    SYMBOL   shift, and go to state 55
+    L_XF     shift, and go to state 190
+    L_AC     shift, and go to state 191
+    L_NOISE  shift, and go to state 192
+    L_SP     shift, and go to state 193
+
+    op    go to state 194
+    name  go to state 195
+
+
+State 179
+
+   47 nodes: node nodes .
+
+    $default  reduce using rule 47 (nodes)
+
+
+State 180
+
+   38 special: L_SAVE '=' expr .
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    $default  reduce using rule 38 (special)
+
+
+State 181
+
+   17 control: L_SENS '(' signals ')' L_TO . '(' signals ')' L_FOR '(' SYMBOL ')'
+
+    '('  shift, and go to state 196
+
+
+State 182
+
+   56 subparams: '(' formals . ')'
+
+    ')'  shift, and go to state 197
+
+
+State 183
+
+   65 formals: $@4 names . $@5
+
+    $default  reduce using rule 64 ($@5)
+
+    $@5  go to state 198
+
+
+State 184
+
+   98 expr: name '(' list ')' .
+
+    $default  reduce using rule 98 (expr)
+
+
+State 185
+
+   95 list: expr ',' . list
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    list  go to state 199
+    expr  go to state 157
+
+
+State 186
+
+  119 expr: expr '?' expr ':' . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 200
+
+
+State 187
+
+   73 model: L_MODEL name name $@6 bindings .
+
+    $default  reduce using rule 73 (model)
+
+
+State 188
+
+   60 function: type name $@3 '(' formals . ')' '{' body '}'
+
+    ')'  shift, and go to state 201
+
+
+State 189
+
+   46 instance: name L_PARAMSET '{' names exprs . '}'
+   93 exprs: exprs . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '}'       shift, and go to state 202
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 155
+
+
+State 190
+
+   40 op: L_XF .
+
+    $default  reduce using rule 40 (op)
+
+
+State 191
+
+   41 op: L_AC .
+
+    $default  reduce using rule 41 (op)
+
+
+State 192
+
+   42 op: L_NOISE .
+
+    $default  reduce using rule 42 (op)
+
+
+State 193
+
+   43 op: L_SP .
+
+    $default  reduce using rule 43 (op)
+
+
+State 194
+
+   39 analysis: name '(' nodes ')' op . bindings
+
+    SYMBOL  shift, and go to state 62
+
+    $default  reduce using rule 124 (empty)
+
+    bindings  go to state 203
+    binding   go to state 65
+    lname     go to state 45
+    empty     go to state 66
+
+
+State 195
+
+   45 instance: name '(' nodes ')' name . $@1 pairings
+
+    $default  reduce using rule 44 ($@1)
+
+    $@1  go to state 204
+
+
+State 196
+
+   17 control: L_SENS '(' signals ')' L_TO '(' . signals ')' L_FOR '(' SYMBOL ')'
+
+    SYMBOL  shift, and go to state 58
+
+    signals  go to state 205
+    signal   go to state 60
+
+
+State 197
+
+   56 subparams: '(' formals ')' .
+
+    $default  reduce using rule 56 (subparams)
+
+
+State 198
+
+   65 formals: $@4 names $@5 .
+
+    $default  reduce using rule 65 (formals)
+
+
+State 199
+
+   95 list: expr ',' list .
+
+    $default  reduce using rule 95 (list)
+
+
+State 200
+
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+  119     | expr '?' expr ':' expr .
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    L_EXP     [reduce using rule 119 (expr)]
+    '*'       [reduce using rule 119 (expr)]
+    '/'       [reduce using rule 119 (expr)]
+    '%'       [reduce using rule 119 (expr)]
+    '+'       [reduce using rule 119 (expr)]
+    '-'       [reduce using rule 119 (expr)]
+    L_GT      [reduce using rule 119 (expr)]
+    L_GE      [reduce using rule 119 (expr)]
+    L_LT      [reduce using rule 119 (expr)]
+    L_LE      [reduce using rule 119 (expr)]
+    L_EQ      [reduce using rule 119 (expr)]
+    L_NE      [reduce using rule 119 (expr)]
+    '&'       [reduce using rule 119 (expr)]
+    L_AND     [reduce using rule 119 (expr)]
+    L_OR      [reduce using rule 119 (expr)]
+    '?'       [reduce using rule 119 (expr)]
+    '|'       [reduce using rule 119 (expr)]
+    $default  reduce using rule 119 (expr)
+
+
+State 201
+
+   60 function: type name $@3 '(' formals ')' . '{' body '}'
+
+    '{'  shift, and go to state 206
+
+
+State 202
+
+   46 instance: name L_PARAMSET '{' names exprs '}' .
+
+    $default  reduce using rule 46 (instance)
+
+
+State 203
+
+   39 analysis: name '(' nodes ')' op bindings .
+
+    $default  reduce using rule 39 (analysis)
+
+
+State 204
+
+   45 instance: name '(' nodes ')' name $@1 . pairings
+
+    SYMBOL  shift, and go to state 207
+
+    $default  reduce using rule 124 (empty)
+
+    pairings    go to state 208
+    pairing     go to state 209
+    insidename  go to state 210
+    empty       go to state 211
+
+
+State 205
+
+   17 control: L_SENS '(' signals ')' L_TO '(' signals . ')' L_FOR '(' SYMBOL ')'
+
+    ')'  shift, and go to state 212
+
+
+State 206
+
+   60 function: type name $@3 '(' formals ')' '{' . body '}'
+
+    SYMBOL  shift, and go to state 62
+
+    $default  reduce using rule 124 (empty)
+
+    body      go to state 213
+    bindings  go to state 214
+    binding   go to state 65
+    lname     go to state 45
+    empty     go to state 66
+
+
+State 207
+
+   77 insidename: SYMBOL .
+
+    $default  reduce using rule 77 (insidename)
+
+
+State 208
+
+   45 instance: name '(' nodes ')' name $@1 pairings .
+
+    $default  reduce using rule 45 (instance)
+
+
+State 209
+
+   74 pairings: pairing . pairings
+
+    SYMBOL  shift, and go to state 207
+
+    $default  reduce using rule 124 (empty)
+
+    pairings    go to state 215
+    pairing     go to state 209
+    insidename  go to state 210
+    empty       go to state 211
+
+
+State 210
+
+   76 pairing: insidename . '=' expr
+
+    '='  shift, and go to state 216
+
+
+State 211
+
+   75 pairings: empty .
+
+    $default  reduce using rule 75 (pairings)
+
+
+State 212
+
+   17 control: L_SENS '(' signals ')' L_TO '(' signals ')' . L_FOR '(' SYMBOL ')'
+
+    L_FOR  shift, and go to state 217
+
+
+State 213
+
+   60 function: type name $@3 '(' formals ')' '{' body . '}'
+
+    '}'  shift, and go to state 218
+
+
+State 214
+
+   66 body: bindings . return
+
+    L_RETURN  shift, and go to state 219
+
+    return  go to state 220
+
+
+State 215
+
+   74 pairings: pairing pairings .
+
+    $default  reduce using rule 74 (pairings)
+
+
+State 216
+
+   76 pairing: insidename '=' . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 221
+
+
+State 217
+
+   17 control: L_SENS '(' signals ')' L_TO '(' signals ')' L_FOR . '(' SYMBOL ')'
+
+    '('  shift, and go to state 222
+
+
+State 218
+
+   60 function: type name $@3 '(' formals ')' '{' body '}' .
+
+    $default  reduce using rule 60 (function)
+
+
+State 219
+
+   67 return: L_RETURN . expr
+
+    SYMBOL    shift, and go to state 55
+    L_STRING  shift, and go to state 74
+    L_INT     shift, and go to state 75
+    L_FLOAT   shift, and go to state 76
+    '+'       shift, and go to state 77
+    '-'       shift, and go to state 78
+    '('       shift, and go to state 79
+    '!'       shift, and go to state 80
+    '['       shift, and go to state 81
+
+    name  go to state 82
+    expr  go to state 223
+
+
+State 220
+
+   66 body: bindings return .
+
+    $default  reduce using rule 66 (body)
+
+
+State 221
+
+   76 pairing: insidename '=' expr .
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    $default  reduce using rule 76 (pairing)
+
+
+State 222
+
+   17 control: L_SENS '(' signals ')' L_TO '(' signals ')' L_FOR '(' . SYMBOL ')'
+
+    SYMBOL  shift, and go to state 224
+
+
+State 223
+
+   67 return: L_RETURN expr .
+  100 expr: expr . '+' expr
+  101     | expr . '-' expr
+  102     | expr . '*' expr
+  103     | expr . '/' expr
+  104     | expr . '%' expr
+  105     | expr . L_EXP expr
+  109     | expr . '&' expr
+  110     | expr . L_AND expr
+  111     | expr . '|' expr
+  112     | expr . L_OR expr
+  113     | expr . L_GT expr
+  114     | expr . L_GE expr
+  115     | expr . L_LT expr
+  116     | expr . L_LE expr
+  117     | expr . L_EQ expr
+  118     | expr . L_NE expr
+  119     | expr . '?' expr ':' expr
+
+    L_EXP  shift, and go to state 118
+    '*'    shift, and go to state 119
+    '/'    shift, and go to state 120
+    '%'    shift, and go to state 121
+    '+'    shift, and go to state 122
+    '-'    shift, and go to state 123
+    L_GT   shift, and go to state 124
+    L_GE   shift, and go to state 125
+    L_LT   shift, and go to state 126
+    L_LE   shift, and go to state 127
+    L_EQ   shift, and go to state 128
+    L_NE   shift, and go to state 129
+    '&'    shift, and go to state 130
+    L_AND  shift, and go to state 131
+    L_OR   shift, and go to state 132
+    '?'    shift, and go to state 133
+    '|'    shift, and go to state 135
+
+    $default  reduce using rule 67 (return)
+
+
+State 224
+
+   17 control: L_SENS '(' signals ')' L_TO '(' signals ')' L_FOR '(' SYMBOL . ')'
+
+    ')'  shift, and go to state 225
+
+
+State 225
+
+   17 control: L_SENS '(' signals ')' L_TO '(' signals ')' L_FOR '(' SYMBOL ')' .
+
+    $default  reduce using rule 17 (control)

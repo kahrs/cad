@@ -1,0 +1,1049 @@
+
+/* BSIM4 model stolen from freeda */
+
+global x0 x1 x2
+
+/***
+	TOXE -- Electrical gate equivalent oxide thickness
+	TOXP -- Physical gate equivalent oxide thickness
+	EPSROX -- Gate dielectric constant relative to vacuum
+	VFB -- Flat-band voltage
+	VTH0 -- Long-channel threshold voltage
+	NGATE -- Poly Si gate doping concentration
+	XL -- Channel length offset due to mask/etch effect
+	XW -- Channel width offset due to mask/etch effect
+	NF -- Number of device fingers
+	W -- Width of the device
+	L -- Length of the device
+	DWG -- Coefficient of gate bias dependence of Weff
+	DWB -- Coefficient of body bias dependence of Weff
+	WINT -- Channel-width offset parameter
+	WLN -- Power of length dependence of width offset
+	WL -- Coefficient of length dependence for width offset
+	WWN -- Power of width dependence of width offset
+	WW -- Coefficient of width dependence for width offset
+	WWL -- Coefficient of length and width cross term dependence for width offset
+	LINT -- Channel-length offset parameter
+	LLN -- Power of length dependence for length offset
+	LL -- Coefficient of length dependence for length offset
+	LW -- Coefficient of width dependence for length offset
+	LWN -- Power of width dependence for length offset
+	LWL -- Coefficient of length and width cross term dependence for length offset
+	K1 -- First-order body bias coefficient
+	K2 -- Second-order body bias coefficient
+	LPEB -- Lateral non-uniform doping effect on K1
+	LPE0 -- Lateral non-uniform doping parameter at Vbs=0
+	K3 -- Narrow width coefficient
+	K3B -- Body effect coefficient of K3
+	W0 -- Narrow width parameter
+	DVT0W -- First coefficient of narrow width effect on Vth for small channel length
+	DVT0 -- First coefficient of short-channel effect on Vth
+	DVT1W -- Second coefficient of narrow width effect on Vth for small channel length
+	DVT1 -- Second coefficient of short-channel effect on Vth
+	DSUB -- DIBL coefficient exponent in sub-threshold region
+	ETA0 -- DIBL coefficient in sub-threshold region
+	ETAB -- Body-bias coefficient for the sub-threshold region
+	TOXM -- Tox at which parameters are extracted
+	T -- Temperature
+	NDEP -- Channel doping concentration at depletion edge for zero body bias
+	PHIN -- Non-uniform vertical doping effect on surface potential
+	VBM -- Maximum applied body bias in VTH0 calculation
+	NSUB -- Substrate doping concentration
+	DVT2W -- Body-bias coefficient of narrow width effect for small channel length
+	NSD -- Source/drain doping concentration fatal error if not positive
+	DVT2 -- Body-bias coefficient of short-channel effect on Vth
+	MINV -- Vgsteff fitting parameter for moderate inversion condition
+	NFACTOR -- Subthreshold swing factor
+	CDSC -- Coupling capacitance between source/drain and channel
+	CDSCD -- Drain-bias sensitivity of CDSC
+	CDSCB -- Body-bias sensitivity of CDSC
+	CIT -- Interface trap capacitance
+	KETA -- Body-bias coefficient of bulk charge effect
+	B0 -- Bulk charge effect coefficient for channel width
+	B1 -- Bulk charge effect width offset
+	A0 -- Coefficient of channel-length dependence bulk charge effect
+	AGS -- Coefficient of Vgs dependence of bulk charge effect
+	XJ -- S/D junction depth
+	U0 -- Low-field mobility
+	UA -- Coefficient of first-order mobility degradation due to vertical field
+	UB -- Coefficient of second-order mobility degradation due to vertical field
+	UC -- Coefficient of mobility degradation due to body-bias effect
+	EU -- Exponent for mobility degradation
+	DELTA -- Parameter for DC Vdseff
+	PDITS -- Impact of drain-induced Vth shift on Rout
+	FPROUT -- Effect of pocket implant on Rout degradation
+	PDITSL -- Channel-length dependence of drain-induced Vth shift for Rout
+	PDITSD -- Vds dependence of drain-induced Vth shift for Rout
+	PSCBE2 -- Second substrate current induced body-effect parameter
+	PSCBE1 -- First substrate current induced body-effect parameter
+	PDIBLCB -- Body bias coefficient of DIBL effect on Rout
+	PVAG -- Gate-bias dependence of Early voltage
+	PDIBL1 -- Parameter for DIBL effect on Rout
+	PDIBL2 -- Parameter for DIBL effect on Rout
+	DROUT -- Channel-length dependence of DIBL effect on Rout
+	PCLM -- Channel length modulation parameter
+	A1 -- First non-saturation effect parameter
+	A2 -- Second non-saturation factor
+	RDSWMIN -- Lightly-doped drain resistance per unit width at high Vgs and zero Vbs
+	RDSW -- Zero bias lightly-doped drain resistance per unit width
+	PRWG -- Gate-bias dependence of LDD resistance
+	PRWB -- Body-bias dependence of LDD resistance
+	WR -- Channel-width dependence parameter of LDD resistance
+	WLC -- Coefficient of length dependence for CV channel width offset
+	WWC -- Coefficient of width dependence for CV channel width offset
+	WWLC -- Coefficient of length and width crossterm dependence for CV channel width offset
+	DWJ -- Offset of the S/D junction width
+	CLC -- Constant term for the short channel model
+	CLE -- Exponential term for the short channel model
+	NOFF -- CV parameter in VgsteffCV for weak to strong inversion
+	VOFFCV -- CV parameter in VgsteffCV for weak to strong inversion
+	CF -- Fringing field capacitance
+	CKAPPAD -- Coefficient of bias-dependent overlap capacitance for the drain side
+	CKAPPAS -- Coefficient of bias-dependent overlap capacitance for the source side
+	LLC -- Coefficient of length dependence on CV channel length offset
+	LWC -- Coefficient of width dependence on CV channel length offset
+	LWLC -- Coefficient of length and width cross term dependence on CV channel length offset
+	WWLC -- Coefficient of length and width cross term dependence on CV channel width offset
+	VOFF -- Offset voltage in the subthreshold region for large W and L
+	VOFFL -- Channel length dependence of VOFF
+	POXEDGE -- Factor for the gate oxide thickness in the S/D overlap regions
+	TOXREF -- Nominal gate oxide thickness for gate dielectric tunneling current model
+	NTOX -- Exponent for the gate oxide ratio
+	DLCIG -- Source/drain overlap length for Igs and Igd
+	AIGSD -- parameter for Igs and Igd
+	BIGSD -- parameter for Igs and Igd
+	CIGSD -- parameter for Igs and Igd
+	MOIN -- Coefficient for gate-bias dependent surface potential
+	VSAT -- Saturation velocity
+	PDITSD -- Vds dependence of drain-induced Vth shift for Rout
+	AIGC -- Parameter for Igcs and Igcd
+	BIGC -- Parameter for Igcs and Igcd
+	CIGC -- Parameter for Igcs and Igcd
+	NIGC -- Parameter for Igcs, Igcd, Igs and Igd
+	PIGCD -- Vds dependence of Igcs and Igcd
+	DVTP0 -- First coefficient of drain induced Vth shift due to long channel pocket devices
+	DVTP1 -- First coefficient of drain induced Vth shift due to long channel pocket devices
+	PRT -- Temperature coefficient for RDSW
+	AT -- Temperature cpefficient for saturation velocity
+	XT -- Doping Depth
+	ALPHA0 -- First parameter of impact ionization current
+	ALPHA1 -- Isub parameter for length scaling
+	BETA0 -- Second parameter of impact ionization current
+	AGIDL -- Pre-exponential coefficient for GIDL
+	BGIDL -- Exponential coefficient for GIDL
+	CGIDL -- Parameter for body-bias effect on GIDL
+	EGIDL -- Fitting parameter for band-bending for GIDL
+	ACDE -- Exponential coefficient for charge thickness
+	DLC -- Channel length offset parameter
+	DWC -- Channel width offset parameter
+	AIGBACC -- Parameter for Igb in accumulation
+	BIGBACC -- Parameter for Igb in accumulation
+	CIGBACC -- Parameter for Igb in accumulation
+	NIGBACC -- Parameter for Igb in accumulation
+	AIGBINV -- Parameter for Igb in inversion
+	BIGBINV -- Parameter for Igb in inversion
+	CIGBINV -- Parameter for Igb in inversion
+	EIGBINV -- Parameter for Igb in inversion
+	NIGBINV -- Parameter for Igb in inversion
+	KT1 -- Temperature coefficient for threshold voltage
+	KT1l -- Channel Length dependence of KT1
+	KT2 -- Body-bias coefficient of Vth with temperature effects
+***/
+
+subckt bsim4(x xt y1 z1)
+parameters
++		TOXE = 3.0e-9
++		TOXP = TOXE
++		EPSROX = 3.9
++		VFB = -1.0
++		VTH0 = 0.7
++		NGATE = 0.0
++		XL = 0.0
++		XW = 0.0
++		NF = 1.0
++		W = 5.0e-6
++		L = 5.0e-6
++		DWG = 0.0
++		DWB = 0.0
++		WINT = 0.0
++		WLN = 1.0
++		WL = 0.0
++		WWN = 1.0
++		WW = 0.0
++		WWL = 0.0
++		LINT = 0.0
++		LLN = 1.0
++		LL = 0.0
++		LW = 0.0
++		LWN = 1.0
++		LWL = 0.0
++		K1 = 0.53
++		K2 = -0.0186
++		LPEB = 0.0
++		LPE0 = 1.74e-7
++		K3 = 80.0
++		K3B = 0.0
++		W0 = 2.5e-6
++		DVT0W = 0.0
++		DVT0 = 2.2
++		DVT1W = 5.3e6
++		DVT1 = 0.53
++		DSUB = 0.56
++		ETA0 = 0.08
++		ETAB = -0.07
++		TOXM = TOXE
++		T = 300.0
++		NDEP = 1.7e17
++		PHIN = 0.0
++		VBM = -3.0
++		NSUB = 6.0e16
++		DVT2W = -0.032
++		NSD = 1.0e20
++		DVT2 = -0.032
++		MINV = 0.0
++		NFACTOR = 1.0
++		CDSC = 2.4e-4
++		CDSCD = 0.0
++		CDSCB = 0.0
++		CIT = 0.0
++		KETA = -0.047
++		B0 = 0.0
++		B1 = 0.0
++		A0 = 1.0
++		AGS = 0.0
++		XJ = 1.5e-7
++		U0 = 0.067
++		UA = 1.0e-15
++		UB = 1.0e-19
++		UC = -0.0465e-9
++		EU = 1.67
++		DELTA = 0.01
++		PDITS = 0.0
++		FPROUT = 0.0
++		PDITSL = 0.0
++		PDITSD = 0.0
++		PSCBE2 = 1.0e-5
++		PSCBE1 = 4.24e8
++		PDIBLCB = 0.0
++		PVAG = 0.0
++		PDIBL1 = 0.0
++		PDIBL2 = 0.0
++		DROUT = 0.56
++		PCLM = 1.3
++		A1 = 0.0
++		A2 = 1.0
++		RDSWMIN = 0.0
++		RDSW = 200.0
++		PRWG = 1.0
++		PRWB = 0.0
++		WR = 1.0
++		WLC = WL
++		WWC = WW
++		WWLC = WWL
++		DWJ = WINT
++		CLC = 1.0e-7
++		CLE = 0.6
++		NOFF = 1.0
++		VOFFCV = 0.0
++		CF = 1.08e-10
++		CKAPPAD = 0.6
++		CKAPPAS = 0.6
++		LLC = 0.0
++		LWC = 0.0
++		LWLC = 0.0
++		WWLC = 0.0
++		VOFF = -0.08
++		VOFFL = 0.0
++		POXEDGE = 1.0
++		TOXREF = TOXE
++		NTOX = 1.0
++		DLCIG = LINT
++		AIGSD = 0.43
++		BIGSD = 0.054
++		CIGSD = 0.075
++		MOIN = 15.0
++		VSAT = 8.0e4
++		PDITSD = 0.0
++		AIGC = 0.43
++		BIGC = 0.054
++		CIGC = 0.075
++		NIGC = 1.0
++		PIGCD = 1.0
++		DVTP0 = 0.0
++		DVTP1 = 0.0
++		PRT = 0.0
++		AT = 3.3e4
++		XT = 1.55e-7
++		ALPHA0 = 0.0
++		ALPHA1 = 0.0
++		BETA0 = 30.0
++		AGIDL = 0.0
++		BGIDL = 2.3e9
++		CGIDL = 0.5
++		EGIDL = 0.8
++		ACDE = 1.0
++		DLC = LINT
++		DWC = WINT
++		AIGBACC = 0.43
++		BIGBACC = 0.054
++		CIGBACC = 0.075
++		NIGBACC = 1.0
++		AIGBINV = 0.35
++		BIGBINV = 0.03
++		CIGBINV = 0.006
++		EIGBINV = 1.1
++		NIGBINV = 3.0
++		KT1 = -0.11
++		KT1l = 0.0
++		KT2 = 0.022
+
+  //state variables
+  //vds x0, vgs x1, vbs x2
+
+#define MAX_EXP 5.834617425e14
+#define MIN_EXP 1.713908431e-15
+#define EXP_THRESHOLD 34.0
+
+
+  k = kBoltzman
+  q = eCharge
+
+  vt = k*T/q
+
+  Eg0 = 1.16 - (7.02e-4 * T * T / (T + 1108.0))
+  
+  ni = 1.45e10 * (T/300.15) * sqrt(T/300.15) * exp(21.5565981 - Eg0/(2.0 * vt))
+
+  e0 = epsilon0
+  esi = 11.7 * e0
+
+  coxe = EPSROX * (e0/TOXE)
+  coxp = EPSROX * (e0/TOXP)
+
+  Lnew = L + XL
+  Wnew = W/NF + XW
+  t0 = pow(Lnew, LLN)
+  t1 = pow(Wnew, LWN)
+  DL = LINT + LL/t0 + LW/t1 + LWL/(t0*t1)
+  DLC = DLC + LLC/t0 + LWC/t1 + LWLC/(t0*t1)
+  DLCIG = DLCIG + LLC/t0 + LWC/t1 + LWLC/(t0*t1)
+
+  t2 = pow(Lnew, WLN)
+  t3 = pow(Wnew,WWN)
+  DW = WINT + WL/t2 + WW/t3 + WWL/(t2*t3)
+  DWC = DWC + WLC/t2 + WWC/t3 + WWLC/(t2*t3)
+  DWJ = DWJ + WLC/t2 + WWC/t3 + WWLC/(t2*t3)
+
+  Leff = Lnew - 2.0 * DL
+
+  Weff = Wnew - 2.0 * DW
+
+  Weffcj = Wnew - 2.0 * DWJ
+
+  phi_s = 0.4 + (k*T/q)*log(NDEP/ni) + PHIN
+
+  m = 0.5 + atan(MINV)/pi
+
+  Voff_prime = VOFF + VOFFL/Leff
+
+  Vbi = (k*T/q)*log(NDEP*NSD/pow(ni,2.0))
+
+  Xdep0 = sqrt(2.0 * esi / (eCharge * NDEP * 1.0e6)) * sqrt(phi_s)
+
+  lt0 = sqrt(esi * TOXE * Xdep0 / (e0*EPSROX))
+
+  litl = sqrt(3.0 * XJ * TOXE)
+
+  gamma1 = 5.753e-12 * sqrt(NDEP)/coxe
+  gamma2 = 5.753e-12 * sqrt(NSUB)/coxe
+
+  VBX = phi_s - 7.7348e-4 * NDEP * XT * XT
+  VBX = (VBX > 0.0)?-VBX:VBX
+
+  t0 = gamma1 - gamma2
+  t1 = sqrt(phi_s - VBX) - sqrt(phi_s)
+  t2 = sqrt(phi_s * (phi_s - VBM)) - phi_s
+
+  K2 = t0 * t1 / (2.0 * t2 + VBM)
+  K1 = gamma2 - 2.0 * K2 * sqrt(phi_s - VBM)
+
+  VTH0 = VFB + phi_s + K1 * sqrt(phi_s)
+
+  K1ox = K1 * TOXE / TOXM
+  K2ox = K2 * TOXE / TOXM
+
+  //---------Calculation for Vbc--------
+  if (K2 < 0.0) {
+      Vbc = 0.9 * (phi_s - pow(0.5 * K1/K2,2.0))
+      Vbc = (Vbc > -3.0)?-3.0:(Vbc < -30.0)?-30.0:Vbc
+    }
+  else {
+    Vbc = -30.0
+  }
+  //--------end Vbc-----------------
+ 
+  //------Calculation for Vbseff-----------
+  T0 = x2 - Vbc - 0.001
+  T1 = sqrt(T0*T0 - 0.004 * Vbc)
+
+#define condassign(a,b,c,d) a = (b > 0)?c:d
+
+  condassign(Vbseff, T0, Vbc + 0.5 * (T0 + T1),Vbc * (1.0 + (-0.002 / (T1 - T0))))
+
+  condassign(Vbseff, -Vbseff + x2, x2 + zero, Vbseff)
+  //------end Vbseff----------------------
+
+  //-----Calculation for Phis---------------
+  condassign(Phis, Vbseff, phi_s * phi_s / (phi_s + Vbseff), phi_s - Vbseff)
+
+  condassign(sqrtPhis, Vbseff, sqrt(phi_s) * phi_s / (phi_s + 0.5*Vbseff), sqrt(Phis))
+
+  //------end Phis---------------------------
+
+  //-----Calculation for Xdep---------------
+  Xdep = Xdep0 * sqrtPhis / sqrt(phi_s)
+  //-----end Xdep--------------------------
+
+  //-------Calculation for Vth------------
+
+  condassign(T1, DVT2W*Vbseff + 0.5, 1.0 + DVT2W * Vbseff, (1.0 + 3.0 * DVT2W*Vbseff) / (3.0 + 8.0 * DVT2W * Vbseff))
+
+  ltw = sqrt(Xdep) * T1 * sqrt(esi/(EPSROX * e0) * TOXE)
+
+  condassign(T1, DVT2*Vbseff + 0.5, 1.0 + DVT2*Vbseff, (1.0 + 3.0 * DVT2*Vbseff) / (3.0 + 8.0 * DVT2*Vbseff))
+
+  lt = sqrt(Xdep) * T1 * sqrt(esi/(EPSROX * e0) * TOXE)
+
+  condassign(Theta0, -(DVT1*Leff/lt) + EXP_THRESHOLD, exp(DVT1 * Leff/lt)/((exp(DVT1*Leff/lt) - 1.0) * (exp(DVT1*Leff/lt) - 1.0) + 2.0*exp(DVT1*Leff/lt)*MIN_EXP), 1.0/(MAX_EXP - 2.0))
+
+  condassign(T5, -(DVT1W*Leff*Weff/ltw) + EXP_THRESHOLD, exp(DVT1W*Leff*Weff/ltw)/((exp(DVT1W*Leff*Weff/ltw) - 1.0) * (exp(DVT1W*Leff*Weff/ltw) - 1.0) + 2.0*exp(DVT1W*Leff*Weff/ltw)*MIN_EXP), 1.0/(MAX_EXP - 2.0))
+
+  T0 = DVT0W * T5
+  T2 = (Vbi - phi_s) * T0
+
+  T0 = sqrt(1.0 + LPE0/Leff)
+  T1 = K1ox * (T1 - 1.0) * sqrtPhis + (KT1 + KT1l/Leff + KT2*Vbseff) * (T/300.0 - 1.0)
+
+  T8 = TOXE * phi_s /(Weff + W0)
+
+  T6 = sqrt(esi / (EPSROX * e0) * TOXE * Xdep0)
+  T0 = DSUB * Leff / T6
+
+  condassign(T5, -T0+EXP_THRESHOLD, exp(T0)/((exp(T0)-1.0)*(exp(T0)-1.0) + 2.0*exp(T0)*MIN_EXP), 1.0/(MAX_EXP - 2.0))
+
+  T3 = ETA0 + ETAB * Vbseff
+
+  condassign(T3, -T3+1.0e-4, (2.0e-4 - T3) / (3.0 - 2.0e4 * T3), ETA0 + ETAB * Vbseff)
+
+  T7 = T3 * T5 * x0
+
+  Vth = VTH0+ (K1ox * sqrtPhis - K1 * sqrtPhis) * sqrt(1.0 + LPEB/Leff) - K2ox * Vbseff - Theta0 * DVT0 * (Vbi - phi_s)- T2 + (K3 + K3B * Vbseff) * TOXE * phi_s /(Weff + W0) + T1 - T7
+  //--------------end Vth-------------------------
+
+
+  //------Calculation for n-------------
+  Cdsc_term = (CDSC + CDSCD * x0 + CDSCB * Vbseff) * Theta0
+  T1 = (NFACTOR*esi/Xdep + Cdsc_term + CIT) / coxe
+
+  condassign(n, T1+0.5, 1.0 + T1, (1.0 + 3.0 * T1) / (3.0 + 8.0 * T1))
+  //------end n-------------------------
+
+  //----Vth correction for pocket implant
+  if (DVTP0 > 0.0)  {
+      T0 = -DVTP1 * x0
+
+      T2 = (T0 < -EXP_THRESHOLD)?MIN_EXP:exp(T0)
+
+      T3 = Leff + DVTP0 * (1.0 + T2)
+      T4 = vt * log(Leff/T3)
+      Vth = Vth - n * T4
+    }
+
+ 
+  //----------Calculation for Vgse-------------
+  T0 = VFB + phi_s
+
+  if((NGATE > 1.0e18) && (NGATE < 1.0e25) && (x1 > T0))  {
+      T1 = 1.0e6 * eCharge * esi * NGATE / (coxe * coxe)
+      T8 = x1 - T0
+      T4 = sqrt(1.0 + 2.0 * T8 / T1)
+      T2 = 2.0 * T8 / (T4 + 1.0)
+      T3 = 0.5 * T2 * T2 / T1
+      T7 = 1.12 - T3 - 0.05
+      T6 = sqrt(T7 * T7 + 0.224)
+      T5 = 1.12 - 0.5 * (T7 + T6)
+    }  
+  else {
+    Vgse = x1
+  }
+  //----------end Vgse-------------------------
+
+  //---------Calculation for Vgsteff------------
+  T2 = m * (Vgse - Vth) /(n * vt)
+
+  condassign(T0, T2 - EXP_THRESHOLD, m * (Vgse - Vth),  n * vt * log(1.0 + exp(T2)))
+  condassign(T0, -T2 - EXP_THRESHOLD, vt * log(1.0 + MIN_EXP) * n, n * vt * log(1.0 + exp(T2)))
+
+  T2 = (Voff_prime - (1.0 - m) * (Vgse - Vth)) / (n * vt)
+
+  condassign(T1, -T2 - EXP_THRESHOLD, m + n * coxe * MIN_EXP / sqrt((phi_s * q * NDEP * esi * 1.0e6)/2.0), m + n * coxe * exp(T2) / sqrt((phi_s * q * NDEP * esi * 1.0e6)/2.0))
+  condassign(T1, T2 - EXP_THRESHOLD, m + n * coxe * MAX_EXP / sqrt((phi_s * q * NDEP * esi * 1.0e6)/2.0), m + n * coxe * exp(T2) / sqrt((phi_s * q * NDEP * esi * 1.0e6)/2.0))
+
+  Vgsteff = T0/T1
+  //--------end Vgsteff-------------------------
+
+  //---Calculation for Weff------------------
+  T9 = sqrtPhis - sqrt(phi_s)
+  Weff = Weff + -2.0 * (DWJ * Vgsteff + DWB * T9)
+
+  if (Weff < 2.0e-8)  {
+      T0 = 1.0 / (6.0e-8 - 2.0*Weff)
+      Weff = 2.0e-8 * (4.0e-8 - Weff) * T0
+    }
+  //-----end Weff---------------------------
+
+
+ //--------Calculation for Rds----------------
+  T0 = 1.0 + PRWG * Vgsteff
+  T1 = PRWB * (sqrtPhis - sqrt(phi_s))
+  T2 = 1.0 / T0 + T1
+  T3 = T2 + sqrt(T2 * T2 + 0.01)
+  T5 = RDSW + PRT * (T/300.0 - 1.0) * NF / (pow(Weffcj * 1.0e6,WR) * NF)
+  T4 = 0.5 * T5
+  RDSWMIN = RDSWMIN + PRT * (T/300.0 - 1.0) * NF / (pow(Weffcj * 1.0e6,WR) * NF)
+  Rds = RDSWMIN + T3 * T4
+ //------end Rds------------------------------
+
+ //---------Calculation for lambda----
+  if (A1 == 0.0) {
+    lambda = A2
+  }
+  else {
+  if (A1 > 0.0)  {  
+      T0 = 1.0 - A2
+      T1 = T0 - A1 * Vgsteff - 0.0001
+      T2 = sqrt(T1 * T1 + 0.0004 * T0)
+      lambda = A2 + T0 - 0.5 * (T1 + T2)
+    }
+  }
+  else  {
+      T1 = A2 + A1 * Vgsteff - 0.0001
+      T2 = sqrt(T1 * T1 + 0.0004 * A2)
+      lambda = 0.5 * (T1 + T2)
+    }
+  //---------end lambda----------------
+
+  
+  //-----------Calculation for F_doping--------------
+  F_doping = 0.5 * sqrt(1.0 + LPEB/Leff) * K1ox / (sqrt(phi_s - Vbseff)) 
++    + K2ox - K3B * TOXE * phi_s / (Weff + W0)
+  //--------end of F-doping----------
+
+  //--------Calculation for Abulk----------
+  T0 = Leff/(Leff + 2.0 * sqrt(XJ * Xdep))
+  T1 = A0 * T0 + B0/(Weff + B1)
+  T2 = 1.0 + F_doping * T1
+
+  Abulk0 = T2
+
+  Abulk = Abulk0 - Vgsteff * F_doping * AGS * A0 * pow(T0,3.0)
+
+  condassign(Abulk, -Abulk + 0.1, (0.2 - Abulk) / (3.0 - 20.0 * Abulk), Abulk)
+
+  condassign(Abulk0, -Abulk0 + 0.1, (0.2 - Abulk0) / (3.0 - 20.0 * Abulk0), Abulk0)
+
+  condassign(Abulk, -Abulk + 0.1, (0.2 - Abulk) / (3.0 - 20.0 * Abulk), Abulk)
+
+  T2 = KETA * Vbseff
+
+  condassign(T0, T2 + 0.9, 1.0 / (1.0 + T2), (17.0 + 20.0 * T2) / (0.8 + T2))
+
+  Abulk = Abulk * T0
+  Abulk0 = Abulk0 * T0
+  //-------end Abulk-------------------
+
+  //--------Calculation for Vb----------
+  Vb = (Vgsteff + 2.0*vt)/Abulk
+  //-----------end Vb-------------------
+
+  //----------Calculation for ueff--------------
+  T1 = (Vgsteff + 2.0 * (VTH0 - VFB - phi_s))/TOXE
+  T2 = exp(EU * log(T1)) * (UA + UC * Vbseff)
+
+  condassign(T3, T2 + 0.8, 1.0 + T2, (0.6 + T2) / (7.0 + 10.0 * T2))
+
+  if (U0 > 1.0) {
+    U0 = U0 / 1.0e4
+  }
+  //condassign(U0, U0 - 1.0, U0 / 1.0e4)
+
+  ueff = U0 / T3 
+  //---------end ueff---------------------------
+
+  //---------Calculation for Esat----------------
+  Esat = 2.0 * (VSAT - AT * (T/300.0 - 1))/ueff
+  //----------end of Esat------------------------
+
+  //---------Calculation for Vdsat-------------
+  if((Rds == 0.0) && (lambda == 1.0))  {   
+      T0 = 1.0 / (Abulk + Esat * Leff + Vgsteff + 2.0 * vt)
+      T3 = Esat * Leff * (Vgsteff + 2.0 * vt)
+      Vdsat = T3 * T0
+    }
+  else  {
+      T6 = (Vgsteff + 2.0 * vt) * Weff * coxe * Rds * (VSAT - AT * (T/300.0 - 1.0))
+      T9 = Abulk * Weff * coxe * Rds * (VSAT - AT * (T/300.0 - 1.0))
+      T0 = 2.0 * Abulk * (T9 - 1.0 + 1.0/lambda)
+      T1 = (Vgsteff + 2.0 * vt) * (2.0/lambda - 1.0) + Abulk * Esat * Leff + 3.0 * (Vgsteff + 2.0 * vt) * Abulk * Rds * Weff * coxe * (VSAT - AT * (T/300.0 - 1.0))
+      T2 = (Vgsteff + 2.0 * vt) * (Esat * Leff + 2.0 * T6)
+      T3 = sqrt(T1*T1 - 2.0 * T0 * T2)
+      Vdsat = (T1 - T3)/T0
+    }
+  //---------end Vdsat-------------------------
+
+  //----------Calculation for Vdseff---------
+  T1 = Vdsat - x0 - DELTA
+  T2 = sqrt(T1 * T1 + 4.0 * DELTA * Vdsat)
+  T0 = T1/T2
+  T3 = 2.0 * DELTA / T2
+
+  condassign(Vdseff, T1, Vdsat - 0.5 * (T1 + T2), Vdsat * (1.0 - 2.0 * DELTA / (T2 - T1)))
+
+  if (x0 == 0.0) {
+    Vdseff = 0.0
+  }
+  condassign(Vdseff, Vdseff - x0, x0 - zero, Vdseff)
+
+//    if (Vdseff > x0)
+//      Vdseff = x0
+  //---------end Vdseff----------------------
+
+  //------------Calculation for Vasat-------
+  T0 = Esat*Leff + Vdsat + 2.0 * (Vgsteff * Rds * Weff * coxe * (VSAT - AT * (T/300.0 - 1.0))) * (1.0 - 0.5 * Abulk * Vdsat / (Vgsteff + 2.0 * vt))
+
+  T1 = 2.0/lambda - 1.0 + Rds * Vgsteff * Weff * coxe * (VSAT - AT * (T/300.0 - 1.0))
+
+  Vasat = T0 / T1
+  //-----------end Vasat--------------------
+
+  //----------Calculation for Ids-----------
+  T1 = 4.0 * (VTH0 - VFB - phi_s)
+  T2 = (Vgsteff + T1) / (2.0e8 * TOXP)
+  T3 = 1.9e-9 / (1.0 + exp(0.7 * log(T2)))
+
+  T4 = esi * coxp /(esi + coxp * T3)
+  T5 = ueff * T4 * Weff/Leff
+  T6 = Vgsteff * (1.0 - 0.5 * Vdseff * Abulk/(Vgsteff + 2.0 * vt))
+  T7 = T5 * T6 / (1.0 + Vdseff/(Esat * Leff))
+
+  Ids0 = T7 / (1.0 + T7 * Rds)
+
+  condassign(F, FPROUT, 1.0 / (1.0 + FPROUT * (sqrt(Leff)/(Vgsteff + 2.0 * vt))), 1.0)
+
+  //------Calculation of Cclm and Vaclm---------
+  condassign(T7, Vgsteff * PVAG/(Esat * L) + 0.9, 1.0 + Vgsteff * PVAG/(Esat * L), (0.8 + (Vgsteff * PVAG/(Esat * L))) / (17.0 + 20.0 * (Vgsteff * PVAG/(Esat * L))))
+
+  condassign(Cclm, (x0 - Vdseff) - 1.0e-10, F * T7 * (1.0 + Rds * Ids0) * (Leff + Vdsat/Esat) / (PCLM * litl), MAX_EXP)
+
+  condassign(Vaclm, (x0 - Vdseff) - 1.0e-10, Cclm * (x0 - Vdseff), MAX_EXP)
+
+  //--------end of Cclm and Vaclm----------
+
+  Va = Vasat + Vaclm
+
+  //----------Calculation for Vadibl-------
+  condassign(T1, -(DROUT*Leff/lt0)+EXP_THRESHOLD, exp(DROUT * Leff/lt0) / (2.0 * exp(DROUT * Leff/lt0) * MIN_EXP + pow(exp(DROUT * Leff/lt0)-1.0 ,2.0)), 1.0 / (MAX_EXP - 2.0))
+
+  theta_rout = PDIBL1 * T1 + PDIBL2
+
+  if (theta_rout > 0.0)  {
+      T2 = (Vgsteff + 2.0 * vt) * Abulk * Vdsat
+      T3 = Vgsteff + 2.0 * vt + Abulk * Vdsat
+      Vadibl = (Vgsteff + 2.0 * vt - T2/T3) / theta_rout
+  
+      condassign(Vadibl, PDIBLCB*Vbseff + 0.9, Vadibl * (1.0 / (1.0 + (PDIBLCB * Vbseff))), Vadibl * (1.0 / (1.0 + (PDIBLCB * Vbseff))))
+  
+      Vadibl = Vadibl * T7
+    }
+  else {
+    Vadibl = MAX_EXP
+  }
+  //-----------end Vadibl---------------
+
+  //-----Calculation for Vascbe----------
+  if (PSCBE2 > 0.0)  {
+      condassign(Vascbe, (x0 - Vdseff) - (PSCBE1*litl/EXP_THRESHOLD), Leff * exp(PSCBE1 * litl/(x0 - Vdseff)) / PSCBE2, MAX_EXP * Leff / PSCBE2)
+    }
+  else {
+    Vascbe = MAX_EXP
+  }
+  //----------end Vascbe----------------
+
+  //---------Calculation for Vadits------
+  condassign(T2, (PDITSD * x0) - EXP_THRESHOLD, MAX_EXP, exp(PDITSD * x0))
+
+  condassign(Vadits, PDITS, F * (1/PDITS) * (1.0 + (1.0 + PDITSL * Leff) * T2), MAX_EXP)
+
+  //--------end Vadits-------------------
+
+  Ids = Ids0 * (1.0 + (x0 - Vdseff)/Vadibl) * (1.0 + (x0 - Vdseff)/Vadits) * (1.0 + log(Va/Vasat)/Cclm)
+
+  //--------Calculation for Subthreshold current------
+  T1 = ALPHA0 + ALPHA1 * Leff
+  if ((T1 <= 0.0) || (BETA0 <= 0.0)) {
+    Isub = 0.0
+  }
+  else   { 
+    T2 = T1 / Leff
+    if ((x0 - Vdseff) > BETA0 / EXP_THRESHOLD)     {
+      T0 = -BETA0 / (x0 - Vdseff)
+      T1 = T2 * (x0 - Vdseff) * exp(T0)
+      T3 = T1 / (x0 - Vdseff) * (T0 - 1.0)
+      }
+    else  {
+      T3 = T2 * MIN_EXP
+      T1 = T3 * (x0 - Vdseff)           
+      }
+    T4 = Ids * Vdseff
+    Isub = T1 * T4
+    }
+  //------------end Isub------------------------------
+ 
+  //-------Calculation for Igidl---------------------
+  T0 = 3.0 * TOXE
+  T1 = (x0 - Vgse - EGIDL) / T0
+  
+  if ((AGIDL <= 0.0) || (BGIDL <= 0.0) || (T1 < 0.0) || (CGIDL <= 0.0) || ((x0 - x2) < 0.0)) {
+    Igidl = 0.0
+  }
+  else {
+    T2 = BGIDL / T1
+    if (T2 < 100.0)  {
+      Igidl = AGIDL * Weffcj * T1 * exp(-T2)
+      T3 = Igidl * (1.0 + T2) / T1
+      }
+    else {
+      Igidl = T1 * AGIDL * Weffcj * 3.720075976e-44
+    }
+    T4 = pow((x0 - x2),2.0)
+    T5 = (x0 - x2) * T4
+    T6 = CGIDL + T5
+    T7 = T5 / T6
+    Igidl = Igidl * T7
+  }
+  //-------end Igidl---------------------------------
+
+  //----and finally.....
+  Ids =  NF * Vdseff * Ids * (1.0 + (x0 - Vdseff)/Vascbe)
+  //--------end Ids--------------------------
+
+  //Equations for gate current
+  
+  A = 4.97232e-7
+  B = 7.45669e11
+
+  //-----------Calculation for Voxacc--------------------
+
+  T0 = DVT1W * Weff * Leff/(sqrt(esi*TOXE*Xdep0/e0))
+
+  condassign(T8, -T0+EXP_THRESHOLD, exp(T0) / ((exp(T0)-1.0)*(exp(T0)-1.0) + 2.0*exp(T0)*MIN_EXP), 1.0/(MAX_EXP - 2.0))
+
+  T0 = DVT0W * T8
+  T8 = T0 * (Vbi - phi_s)
+
+  T0 = DVT1 * Leff /(sqrt(esi*TOXE*Xdep0/e0))
+
+  condassign(T9, -T0+EXP_THRESHOLD, exp(T0) / ((exp(T0)-1.0)*(exp(T0)-1.0) + 2.0*exp(T0)*MIN_EXP), 1.0/(MAX_EXP - 2.0))
+
+  KT1 = -0.11
+  KT1L = 0.0
+
+  T9 = DVT0 * T9 * (Vbi - phi_s)
+  T4 = TOXE * phi_s / (Weff + W0)
+  T0 = sqrt(1.0 + LPE0/Leff)
+  T5 = K1ox * (T0 - 1.0) * sqrtPhis + (KT1 + KT1L / Leff) * (T/300.0 - 1.0)
+  T6 = VTH0 - T8 - T9 + K3 * T4 + T5
+
+  Vfbzb = T6 - phi_s - K1 * sqrtPhis
+
+  T3 = Vfbzb - Vgse + Vbseff - 0.02
+
+  condassign(T0, -Vfbzb, sqrt(pow(T3,2.0) + 4*Vfbzb*0.02), sqrt(pow(T3,2.0) - 4*Vfbzb*0.02))
+
+  Voxacc = Vfbzb - (Vfbzb - 0.5*(T3 + T0))
+
+  if (Voxacc < 0.0) {
+    Voxacc = 0.0
+  }
+  //---------end Voxacc--------------------------------
+
+  //--------Calculation for Voxdepinv------------------
+
+  T1 = Vgse - (Vfbzb - 0.5*(T3 + T0)) - Vbseff - Vgsteff
+
+  if (K1ox == 0.0) {
+    Voxdepinv = 0.0
+  }
+
+  condassign(Voxdepinv, -T1, -T1, K1ox * (sqrt(T1 + 0.25*K1ox*K1ox) - 0.5*K1ox))
+ 
+  Voxdepinv = Voxdepinv + Vgsteff
+  //-------end Voxdepinv------------------------------
+
+  //-------Calculation for Igc---------------------
+
+  condassign(Vaux, (Vgse-VTH0)/(vt*NIGC) - EXP_THRESHOLD, Vgse - VTH0, vt*NIGC*log(1.0 + exp((Vgse - VTH0)/(vt*NIGC))))
+  condassign(Vaux, -(Vgse-VTH0)/(vt*NIGC) - EXP_THRESHOLD, vt*NIGC*log(1.0 + MIN_EXP), vt*NIGC*log(1.0 + exp((Vgse - VTH0)/(vt*NIGC))))
+
+  T3 = AIGC * CIGC - BIGC
+  T4 = BIGC * CIGC
+  T5 = (-B*TOXE) * (AIGC + T3 * Voxdepinv - T4 * Voxdepinv * Voxdepinv)
+
+  condassign(T6, T5 - EXP_THRESHOLD, MAX_EXP, exp(T5))
+  condassign(T6, -T5 - EXP_THRESHOLD, MIN_EXP, exp(T5))
+
+  Igc = A* Weff* Leff* exp(NTOX * log(TOXREF/TOXE)) * Vgse * Vaux * T6
+  //--------end Igc---------------------------------
+
+  //----Calculation for Igcs and Igcd--------------
+
+  T1 = ((-PIGCD*x0) > EXP_THRESHOLD)?MAX_EXP:((-PIGCD*x0) < -EXP_THRESHOLD)?MIN_EXP:exp(-PIGCD*x0)
+
+  //This condassign does not work. Perhaps the default exponential is out of range
+  //condassign(T1, (-PIGCD*x0) - EXP_THRESHOLD, MAX_EXP, exp(-PIGCD*x0))
+  //condassign(T1, PIGCD*x0 - EXP_THRESHOLD, MIN_EXP, exp(-PIGCD*x0))
+
+  T8 = (-PIGCD*x0) * (-PIGCD*x0) + 2.0e-4
+  T0 = T8 * T8
+  T2 = T1 - 1.0 + 1.0e-4
+  T10 = (T2 - (-PIGCD*x0)) / T8
+
+  Igcs = Igc * T10
+
+  T2 = T1 - 1.0 - 1.0e-4
+  T10 = ((-PIGCD * x0) * T1 - T2) / T8
+
+  Igcd = Igc * T10
+  //-----end Igcs and Igcd-------------------------
+
+  //----Calculation for Igs and Igd---------------
+
+  condassign(Vfbsd, NGATE, (k*T/q)*log(NGATE/NSD), 0.0)
+
+  T0 = x1 - Vfbsd
+  Vgse = sqrt(T0 * T0 + 1.0e-4)
+
+  T2 = x1 * Vgse
+  T3 = AIGSD * CIGSD - BIGSD
+  T4 = BIGSD * CIGSD
+  T5 = (-B * TOXE * POXEDGE) * (AIGSD + T3 * Vgse - T4 * Vgse * Vgse)
+
+  Toxratioedge = exp(NTOX * log(TOXREF / (TOXE * POXEDGE))) / TOXE / TOXE / POXEDGE / POXEDGE
+
+  condassign(T6, T5 - EXP_THRESHOLD, MAX_EXP, exp(T5))
+  condassign(T6, -T5 - EXP_THRESHOLD, MIN_EXP, exp(T5))
+
+  Igs = A * Weff * Toxratioedge * DLCIG * T6 * T2
+
+  T0 = (x1 - x0) - Vfbsd
+
+  Vgde = sqrt(T0 * T0 + 1.0e-4)
+
+  T2 = Vgde * (x1 - x0)
+  T5 = (-B * TOXE * POXEDGE) * (AIGSD + T3 * Vgde - T4 * Vgde * Vgde)
+
+  T6 = (T5 > EXP_THRESHOLD)?MAX_EXP:(T5 < -EXP_THRESHOLD)?MIN_EXP:exp(T5)
+
+//  This condassign does not work
+//    condassign(T6, T5 - EXP_THRESHOLD, MAX_EXP, exp(T5))
+//    condassign(T6, -T5 - EXP_THRESHOLD, MIN_EXP, exp(T5))
+
+  Igd = A * Weff * Toxratioedge * DLCIG * T6 * T2
+  //------end Igs and Igd-----------------------------
+
+  //---------Calculations for Igb--------------------
+  T0 = vt * NIGBACC
+  T1 = -Vgse + Vbseff + Vfbzb
+
+  condassign(Vaux, T1/T0 - EXP_THRESHOLD, T1, T0 * log(1.0 + exp(T1/T0)))
+  condassign(Vaux, -T1/T0 - EXP_THRESHOLD, T0 * log(1.0 + MIN_EXP), T0 * log(1.0 + exp(T1/T0)))
+
+  T2 = (Vgse - Vbseff) * Vaux
+  T11 = 4.97232e-7 * Weff * Leff * exp(NTOX * log(TOXREF/TOXE))
+  T12 = -7.45669e-11 * TOXE
+  T3 = AIGBACC * CIGBACC - BIGBACC
+  T4 = BIGBACC * CIGBACC
+  T5 = T12 * (AIGBACC + T3 * Voxacc - T4 * Voxacc * Voxacc)
+
+  condassign(T6, T5 - EXP_THRESHOLD, MAX_EXP, exp(T5))
+  condassign(T6, -T5 - EXP_THRESHOLD, MIN_EXP, exp(T5))
+
+  Igbacc = T11 * T2 * T6
+
+  T0 = vt * NIGBINV
+  T1 = Voxdepinv - EIGBINV
+
+  condassign(Vaux, T1/T0 - EXP_THRESHOLD, T1, T0 * log(1.0 + exp(T1/T0)))
+  condassign(Vaux, -T1/T0 - EXP_THRESHOLD, T0 * log(1.0 + MIN_EXP), T0 * log(1.0 + exp(T1/T0)))
+
+  T2 = (Vgse - Vbseff) * Vaux
+  T11 = T11 * 0.75610
+  T12 = T12 * 1.31724
+  T3 = AIGBINV * CIGBINV - BIGBINV
+  T4 = BIGBINV * CIGBINV
+  T5 = T12 * (AIGBINV + T3 * Voxdepinv - T4 * Voxdepinv * Voxdepinv)
+
+  condassign(T6, T5 - EXP_THRESHOLD, MAX_EXP, exp(T5))
+  condassign(T6, -T5 - EXP_THRESHOLD, MIN_EXP, exp(T5))
+
+  Igbinv = T11 * T2 * T6
+
+  Igb = Igbinv + Igbacc
+
+  //Equations for capacitance. CAPMOD=2 with a 40/60 charge partiton between the source and drain. 
+  //The equations for charge at the repsective transistor nodes begins here. 
+  //The derivatives of charge with respect to time are evaluated in eval2.
+  //That corresponds to the current contribution at each node.
+
+  //------Calculation for LeffCV and WeffCV----------
+  Leff = Lnew - 2.0 * DLC
+  Weff = Wnew - 2.0 * DWC
+  //------end LeffCV and WeffCV---------------------
+
+  //-----Calculation for VbseffCV---------------------
+
+  condassign(VbseffCV, Vbseff, phi_s - Phis, Vbseff)
+  //------end VbseffCV--------------------------------      
+
+  //------Calculation for VgsteffCV------------------
+  T0 = n * NOFF * k * T / q
+  T1 = (Vgse - Vth) / T0
+
+  condassign(Vgsteff, T1 - EXP_THRESHOLD, Vgse - Vth - VOFFCV, T0 * log(1.0 + exp(T1)))
+  condassign(Vgsteff, -T1 - EXP_THRESHOLD, T0 * log(1.0 + MIN_EXP), T0 * log(1.0 + exp(T1)))
+  //-------End VgsteffCV------------------------------
+
+  //---------------Calculation for Vfbeff-------------
+  V3 = Vfbzb - Vgse + VbseffCV - 0.02
+
+  condassign(T0, Vfbzb, sqrt(V3 * V3 + 4.0 * 0.02 * Vfbzb), sqrt(V3 * V3 - 4.0 * 0.02 * Vfbzb))
+
+  Vfbeff = Vfbzb - 0.5 * (V3 + T0)
+  //-----------end Vfbeff-----------------------------
+
+  T0 = (Vgse - VbseffCV - Vfbzb) / TOXP
+
+  //-------------Calculation for Tcen----------------
+  LDEB = sqrt(esi * vt/(q * NDEP * 1.0e6)) / 3.0
+
+  T1 = T0 * ACDE
+
+  condassign(Tcen, EXP_THRESHOLD+T1, LDEB * exp(T1), LDEB * MAX_EXP)
+  condassign(Tcen, -T1 + EXP_THRESHOLD, LDEB * exp(T1), LDEB * MAX_EXP)
+  condassign(Tcen, -T1 - EXP_THRESHOLD, LDEB * MIN_EXP, LDEB * MAX_EXP)
+
+  V3 = LDEB - Tcen - 1.0e-3 * TOXP
+  
+  V4 = sqrt(V3 * V3 + 4.0 * 1.0e-3 * TOXP * LDEB)
+
+  Tcen = LDEB - 0.5 * (V3 + V4)
+  //-------------end Tcen----------------------------
+
+  Ccen = esi / Tcen
+  
+  Coxeff = Ccen * coxp / (Ccen + coxp)
+
+  //--------Calculation for QoverlapCox-------------
+
+  CoxWLcen = coxp * Weff * Leff * NF * Coxeff / coxe
+  Qac0 = CoxWLcen * (Vfbeff - Vfbzb)
+  QoverlapCox = Qac0 / Coxeff
+
+  T0 = 0.5 * K1ox
+  T3 = Vgse - Vfbeff - VbseffCV - Vgsteff
+  if (K1ox == 0.0)  {
+    T1 = 0.0
+    T2 = 0.0
+    }
+  else {
+    if (T3 < 0.0) {
+    T1 = T0 + T3 / K1ox
+    T2 = CoxWLcen
+    }
+    else {
+    T1 = sqrt(T0 * T0 + T3)
+    T2 = CoxWLcen * T0 / T1
+    }
+  }
+
+  Qsub0 = CoxWLcen * K1ox * (T1 - T0)
+  QoverlapCox = Qsub0 / Coxeff
+
+  //--------Calculation for Delta_phis------------
+  condassign(T2, K1ox, MOIN * vt * K1ox * K1ox, 0.25 * MOIN * vt)
+  condassign(T0, K1ox, K1ox * sqrt(phi_s), 0.5 * sqrt(phi_s))
+
+  T1 = 2.0 * T0 + Vgsteff
+
+  Delta_phis = vt * log(1.0 + T1 * Vgsteff / T2)
+  //----------end Delta_phis-------------------
+
+  //The calculation for Tcen must be done once more
+  T0 = (Vgsteff + 4.0*(VTH0 - VFB - phi_s))/ (2.0 * TOXP)
+  T1 = 1.0 + exp(0.7 * log(T0))
+  T2 = 0.7 * exp(0.7 * log(T0)) / (T0 * 2.0 * TOXP)
+  Tcen = 1.9e-9 / T1
+
+  Ccen = esi / Tcen
+  Coxeff = Ccen * coxp / (Ccen + coxp)
+  CoxWLcen = coxp * Weff * Leff * Coxeff / coxe
+
+  AbulkCV = Abulk0 * (1.0 + pow((CLC/Leff),CLE))
+  
+  VdsatCV = (Vgsteff - Delta_phis) / AbulkCV
+
+  T0 = VdsatCV - x0 - 0.02
+  T1 = sqrt(T0 * T0 + 4.0 * 0.02 * VdsatCV)
+
+  condassign(VdseffCV, T0, VdsatCV - 0.5 * (T0 + T1), VdsatCV * (1.0 - 0.04/(T1-T0)))
+
+  if (x0 == 0.0) {
+    VdseffCV = 0.0
+  }
+  T0 = AbulkCV * VdseffCV
+  T1 = Vgsteff - Delta_phis
+  T2 = 12.0 * (T1 - 0.5 * T0 + 1.0e-20)
+  T3 = T0 / T2
+  T4 = 1.0 - 12.0 * T3 * T3
+  T5 = AbulkCV * (6.0 * T0 * (4.0 * T1 - T0) / (T2 * T2) - 0.5)
+  T6 = T5 * VdseffCV / AbulkCV
+
+  qgate = CoxWLcen * (T1 - T0 * (0.5 - T3))
+
+  qbulk = CoxWLcen * (1.0 - AbulkCV) * (0.5*VdseffCV - T0*VdseffCV/T2)
+
+  QoverlapCox = qbulk / Coxeff
+
+  T2 = T2 / 12.0
+  T3 = 0.5 * CoxWLcen / (T2 * T2)
+  T4 = T1 * (2.0 * T0 * T0 / 3.0 + T1 * (T1 - 4.0 * T0 / 3.0)) - 2.0 * T0 * T0 * T0 / 15.0
+
+  qsrc = -T3 * T4
+
+  qgate = qgate + Qac0 + Qsub0 - qbulk
+  qbulk = qbulk - Qac0 + Qsub0
+  qdrn = -(qbulk + qgate + qsrc)
+  qsrc = -(qbulk + qgate + qdrn)
+
+  y10 = qdrn//Drain charge
+  y11 = qgate//Gate Charge
+  y12 = qsrc//Source charge
+
+  z10 = Ids + Isub + Igidl - Igcd - Igd//Drain current
+  z11 = Igs + Igcd + Igd + Igcs + Igb//Gate current
+  z12 = -Ids - Igs - Igcs//Source current
+
+  z13 = x0 - x2//Vdb
+  z14 = x1 - x2 //Vgb
+  z15 = -x2 //Vsb
+end bsim4
